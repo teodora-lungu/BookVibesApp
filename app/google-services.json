@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "96716868002",
+    "firebase_url": "https://book-vibes-4a36b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "book-vibes-4a36b",
+    "storage_bucket": "book-vibes-4a36b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96716868002:android:c30d1db50ebbbfe54dcafb",
+        "android_client_info": {
+          "package_name": "com.example.bookvibes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "96716868002-m7plo4o3v4vdof13j3b2263pc798tebh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5o_KGOgDxg29nbBV-qCVKxFg5Un1eLf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "96716868002-m7plo4o3v4vdof13j3b2263pc798tebh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
