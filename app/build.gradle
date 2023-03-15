@@ -31,21 +31,43 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    packagingOptions {
+        pickFirst 'META-INF/versions/9/previous-compilation-data.bin'
+       // pickFirst 'META-INF/LGPL2.1'
+    }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     implementation 'com.google.firebase:firebase-auth:21.0.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.4'
     //implementation 'com.google.firebase:firebase-database-ktx:20.0.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.google.firebase:firebase-auth-ktx'
+
+    implementation 'org.jsoup:jsoup:1.15.4'
+    //ext.anko_version='0.10.9'
+    //implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0-Beta")
+
+    implementation 'com.github.bumptech.glide:glide:4.15.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.0'
+
+    //for Navigation Drawer
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }
