@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single"></group>
+
+    <item android:title="Home">
+
+    <menu>
+        <group>
+        <item
+            android:id="@+id/nav_my_books"
+            android:title="My books"
+            android:icon="@drawable/baseline_menu_book_24"/>
+
+        <item
+            android:id="@+id/nav_book_of_the_day"
+            android:title="Book of the day"
+            android:icon="@drawable/baseline_auto_awesome_24"/>
+
+        <item
+            android:id="@+id/nav_fav_books"
+            android:title="Favourite books"
+            android:icon="@drawable/baseline_favorite_24"/>
+
+        <item
+            android:id="@+id/nav_books_to_read"
+            android:title="Books to read"
+            android:icon="@drawable/baseline_filter_vintage_24"/>
+
+        <item
+            android:id="@+id/nav_stopped_reading"
+            android:title="Stopped reading"
+            android:icon="@drawable/baseline_heart_broken_24"/>
+    </group>
+    </menu>
+
+    </item>
+
+    <item android:title="Profile">
+
+        <menu>
+            <group>
+            <item
+                android:id="@+id/nav_logout"
+                android:title="Log out"
+                android:icon="@drawable/baseline_logout_24" />
+            </group>
+        </menu>
+    </item>
+
+</menu>
