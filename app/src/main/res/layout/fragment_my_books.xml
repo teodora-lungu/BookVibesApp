@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MyBooksFragment">
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_weight="1"-->
+<!--        android:background="@android:color/transparent"/>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:layout_marginBottom="50dp"
+        tools:listitem="@layout/book_list"
+        />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/add_book_imageView"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="91dp"-->
+<!--        android:src="@drawable/booksmall"-->
+<!--        android:layout_marginTop="490dp"/>-->
+
+<!--    <ImageView-->
+<!--        android:id="@+id/add_book_imageView_doi"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="91dp"-->
+<!--        android:src="@drawable/librarydoi"-->
+<!--        android:layout_marginTop="490dp"-->
+<!--        android:layout_marginStart="300dp"/>-->
+
+    <Button
+        android:id="@+id/add_book_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="Add Book" />
+
+
+</FrameLayout>

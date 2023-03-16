@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 //R.id.nav_logout -> Toast.makeText(applicationContext, "Clicked Logout", Toast.LENGTH_SHORT).show()
                 R.id.nav_books_to_read -> Toast.makeText(applicationContext, "Clicked Books to read", Toast.LENGTH_SHORT).show()
                 R.id.nav_stopped_reading -> Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
-                R.id.nav_my_books -> replaceFragment(MyBooksFragmentList(), it.title.toString())
+                R.id.nav_my_books -> replaceFragment(MyBooksFragment(), it.title.toString())
                 R.id.nav_logout -> logout(navView)
             }
             true
@@ -133,7 +133,8 @@ class MainActivity : AppCompatActivity() {
                             userNicknameLabel.text = nickname
                            // return nickname
                         } else {
-                           // userNicknameLabel.text = "Please add a nickname"
+                            userNicknameLabel.text = "Please add a nickname"
+                            Log.e(TAG, "Nickname is empaty")
                         }
                     }
                     override fun onCancelled(error: DatabaseError) {
