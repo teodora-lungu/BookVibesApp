@@ -1,29 +1,34 @@
 package com.example.bookvibes
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+public var showBookGenres = false
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    //lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        //drawerLayout = findViewById(R.id.drawerLayout)
 
         // Initialize Firebase Auth
         auth = Firebase.auth
 
         val loginText: TextView = findViewById(R.id.textView_register_now)
         loginText.setOnClickListener {
+            showBookGenres = true
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -54,8 +59,8 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, let move to the next activity
-
-                    val intent = Intent(this, MainActivity::class.java)
+                   // replaceFragment(BookGenresFragment(), title = "Choose Your Fav Genres")
+                    val intent = Intent(this, BookGenresFragment::class.java)
                     startActivity(intent)
 
                     Toast.makeText(baseContext, "Success",
@@ -72,5 +77,14 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-
+//    private fun replaceFragment(fragment : Fragment, title: String) {
+//
+//        // get reference for the fragment manager
+//        val fragmentManager = supportFragmentManager
+//        val fragmentTransaction = fragmentManager.beginTransaction()
+//        fragmentTransaction.replace(com.google.android.material.R.id.layout, fragment)
+//        fragmentTransaction.commit()
+//        //drawerLayout.closeDrawers() //close drawers whenever user tabs it
+//        setTitle(title)
+//    }
 }

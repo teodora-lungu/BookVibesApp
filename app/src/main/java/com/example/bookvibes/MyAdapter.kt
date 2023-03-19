@@ -25,12 +25,27 @@ class MyAdapter(private val bookList : ArrayList<Books>) : RecyclerView.Adapter<
         //holder.bookImage.setImageResource(currentItem.bookImage)
         holder.bookTitle.text = currentItem.title
         holder.bookAuthor.text = currentItem.author
+        //holder.bookGenres.setText(currentItem.categories)
+        //holder.checkbox.visibility = View.VISIBLE
+
+//        if (showBookGenres) {
+//            //holder.bookGenres.re
+//            for (category in currentItem.categories) {
+//                //val checkBox = CheckBox(holder.itemView.context)
+//                //checkBox.text = category.
+//                holder.bookGenres.text = category
+//                holder.checkbox.isChecked = holder.checkbox.isSelected
+//
+//            }
+//        }
     }
 
     class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
        // val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
         val bookTitle : TextView = itemView.findViewById(R.id.book_title)
         val bookAuthor : TextView = itemView.findViewById(R.id.book_author)
+       // val checkbox : CheckBox = itemView.findViewById(R.id.type_checkboxView)
+        //val bookGenres : TextView = itemView.findViewById(R.id.book_type)
     }
 
     fun addBook(book: Books) {

@@ -1,17 +1,27 @@
 package com.example.bookvibes
 
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues.TAG
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -21,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,18 +43,35 @@ class MainActivity : AppCompatActivity() {
         //.child(currentUser?.uid!!)
     val uid = currentUser?.uid.toString()
 
+
     lateinit var toggle : ActionBarDrawerToggle
     lateinit var drawerLayout: DrawerLayout
 
+
+    private lateinit var calendar: Calendar
+    private lateinit var alarmManager : AlarmManager
+    private lateinit var pendingIntent: PendingIntent
     private lateinit var nicknameEditText : EditText
+    //private lateinit var binding : ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //setContentView(binding.navView)
+        /**Notification Book of the Day**/
+        createNotificationChannel()
+        setNotification()
 
         drawerLayout = findViewById(R.id.drawerLayout)
         val navView : NavigationView = findViewById(R.id.nav_view)
         val headerView = navView.getHeaderView(0)
+
+        /** get user image **/
+        //binding = ActivityMainBinding.inflate(layoutInflater)
+        //setContentView(binding.root)
+        val userImage = headerView.findViewById<CircleImageView>(R.id.user_image)
+        getUserImageFromDatabase(uid, userImage)
+        setUserImage(userImage)
 
         // get user email added by default
         val userEmailView = headerView.findViewById<TextView>(R.id.user_email)
@@ -67,15 +96,98 @@ class MainActivity : AppCompatActivity() {
             it.isChecked = true
 
             when(it.itemId) {
-                R.id.nav_book_of_the_day -> replaceFragment(BookOfTheDayFragment(), it.title.toString())
+                R.id.nav_book_of_the_day -> {
+                    val intent = Intent(this, BookOfTheDayActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
                 R.id.nav_fav_books -> Toast.makeText(applicationContext, "Clicked Fav Book", Toast.LENGTH_SHORT).show()
                 //R.id.nav_logout -> Toast.makeText(applicationContext, "Clicked Logout", Toast.LENGTH_SHORT).show()
                 R.id.nav_books_to_read -> Toast.makeText(applicationContext, "Clicked Books to read", Toast.LENGTH_SHORT).show()
-                R.id.nav_stopped_reading -> Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
+                R.id.nav_stopped_reading -> {
+                    replaceFragment(BookGenresFragment(), it.title.toString())
+                    Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
+                }
                 R.id.nav_my_books -> replaceFragment(MyBooksFragment(), it.title.toString())
                 R.id.nav_logout -> logout(navView)
             }
             true
+        }
+    }
+
+    private fun setNotification() {
+
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
+
+        calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        println(System.currentTimeMillis())
+        calendar.set(Calendar.HOUR_OF_DAY, 18)
+        calendar.set(Calendar.MINUTE, 58)
+        alarmManager.setRepeating(
+
+            AlarmManager.RTC_WAKEUP, calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY, pendingIntent
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        alarmManager.cancel(pendingIntent)
+    }
+    private fun createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name : CharSequence = "BookofTheDayChannel"
+            val description = "Channel for Book of the Day"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel("bookoftheday", name, importance)
+            channel.description = description
+            val notificationManager = getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun getUserImageFromDatabase(uid: String, userImage: ImageView) {
+        if (currentUser != null) {
+            userRef.child(uid).child("image")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val userImageFromDatabse = snapshot.getValue()
+                        if (userImageFromDatabse != null)
+                            /** Load image from Firebase **/
+                            Glide.with(this@MainActivity)
+                                .load(userImageFromDatabse)
+                                .circleCrop()
+                                .into(userImage)
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(TAG, "Failed to get image from database", error.toException())
+                    }
+                })
+        }
+    }
+
+    private fun setUserImage(userImage: CircleImageView?) {
+
+        val pickImage = registerForActivityResult(
+            ActivityResultContracts.GetContent(),
+            ActivityResultCallback {
+                /** handle image**/
+                userRef.child(uid).child("image").setValue(it.toString())
+
+                /**TODO( Check if image was selected )**/
+                userImage?.setImageURI(it)
+                Toast.makeText(this, "Image change succesfully", Toast.LENGTH_SHORT).show()
+            }
+        )
+        userImage?.setOnClickListener {
+            pickImage.launch("image/*")
         }
     }
 
@@ -192,6 +304,4 @@ class MainActivity : AppCompatActivity() {
         }
         builder.show()
     }
-
-
 }

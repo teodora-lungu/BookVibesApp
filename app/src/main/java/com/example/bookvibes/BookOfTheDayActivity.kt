@@ -74,14 +74,19 @@ class BookOfTheDayActivity : AppCompatActivity() {
                 val desc_cleared = description.substring(0,description.indexOf("\n"))
                 desc_list.add(desc_cleared)
                 println("ce pana mea?$desc_cleared")
-                //println(img_list)
+                println(img_list)
                 //println(img)
 
-            }
-            runOnUiThread {
+                runOnUiThread {
             //println("img list is : ->>>>$img_list")
             Glide.with(this@BookOfTheDayActivity).load(img_list[0]).into(book_img)
-                descView.text = desc_list[0]
+                descView.text = desc_cleared
+
+            }
+//            runOnUiThread {
+//            //println("img list is : ->>>>$img_list")
+//            Glide.with(this@BookOfTheDayActivity).load(img_list[0]).into(book_img)
+//                descView.text = desc_cleared
         }
 
         }
