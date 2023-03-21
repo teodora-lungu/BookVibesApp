@@ -1,11 +1,13 @@
 package com.example.bookvibes
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -96,17 +98,25 @@ class BookGenresFragment : Fragment() {
 
     private fun getGenreList(uid: String, checkBox: CheckBox) {
 
-        userRef.child(uid).child("Pref Genres").addListenerForSingleValueEvent(object :
+        userRef.child(uid).child("Pref Genres").addValueEventListener(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val genres = snapshot.children
 
                 for (gen in genres) {
-                    // TODO(modify tomorrow)
 
-                    val isChecked = (checkBox as CheckBox).isChecked
-                    bookGenresList[4].isSelected = isChecked
+                    val category = gen.key
+                    val isSelected = gen.getValue(Boolean::class.java) ?: false
+                    //bookGenresList.add(Genres(category!!, isSelected))
+
+                    for (genre in bookGenresList) {
+                        if (genre.categories == category) {
+                            genre.isSelected = isSelected
+                            break
+                        }
+                    }
                 }
+                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -134,11 +144,7 @@ class BookGenresFragment : Fragment() {
         adapter = GenresAdapter(bookGenresList)
         recyclerView.adapter = adapter
 
-        //for (i in bookGenresList.indices) {
-          //  Log.d("TAG", "---->>>>>" + bookGenresList[i])
-
-
-            adapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
 
             saveButton.setOnClickListener {
                 userRef.child(uid).child("Pref Genres").removeValue()
@@ -146,21 +152,15 @@ class BookGenresFragment : Fragment() {
                     //  Log.d("TAG", "---->>>>>" + bookGenresList[i])
                 if (currentUser != null) {
                     if (bookGenresList[i].isSelected) {
-                        userRef.child(uid).child("Pref Genres").push()
-                            .setValue(bookGenresList[i].categories)
+                        val genre = bookGenresList[i].categories
+                        val childRef = userRef.child(uid).child("Pref Genres").child(genre)
+                        childRef.setValue(bookGenresList[i].isSelected)
                     }
                 }
             }
-
-//            saveButton.setOnClickListener {
-//                /** Save data to Firebase **/
-//                if (currentUser != null) {
-//                    userRef.child(uid).child("Pref Genres").push()
-//                        .setValue(bookGenresList[i])
-//                   // userRef.child(uid).child("Pref Genres").push()
-//                     //   .set
-//                }
-//            }
+                Toast.makeText(context, "Your data have been saved", Toast.LENGTH_SHORT).show()
+                val intent = Intent(activity, MainActivity::class.java)
+                startActivity(intent)
         }
 
     }

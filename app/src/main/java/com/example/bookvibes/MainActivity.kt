@@ -96,18 +96,17 @@ class MainActivity : AppCompatActivity() {
             it.isChecked = true
 
             when(it.itemId) {
-                R.id.nav_book_of_the_day -> {
+                R.id.nav_book_of_the_day ->
+                    //replaceFragment(BookOfTheDayFragment(), it.title.toString())
+                               {
                     val intent = Intent(this, BookOfTheDayActivity::class.java)
                     startActivity(intent)
                     true
                 }
                 R.id.nav_fav_books -> Toast.makeText(applicationContext, "Clicked Fav Book", Toast.LENGTH_SHORT).show()
-                //R.id.nav_logout -> Toast.makeText(applicationContext, "Clicked Logout", Toast.LENGTH_SHORT).show()
                 R.id.nav_books_to_read -> Toast.makeText(applicationContext, "Clicked Books to read", Toast.LENGTH_SHORT).show()
-                R.id.nav_stopped_reading -> {
-                    replaceFragment(BookGenresFragment(), it.title.toString())
-                    Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
-                }
+                R.id.nav_stopped_reading -> Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
+                R.id.nav_book_taste -> replaceFragment(BookGenresFragment(), it.title.toString())
                 R.id.nav_my_books -> replaceFragment(MyBooksFragment(), it.title.toString())
                 R.id.nav_logout -> logout(navView)
             }

@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-public var showBookGenres = false
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -21,14 +20,11 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        //drawerLayout = findViewById(R.id.drawerLayout)
-
         // Initialize Firebase Auth
         auth = Firebase.auth
 
         val loginText: TextView = findViewById(R.id.textView_register_now)
         loginText.setOnClickListener {
-            showBookGenres = true
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -60,7 +56,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, let move to the next activity
                    // replaceFragment(BookGenresFragment(), title = "Choose Your Fav Genres")
-                    val intent = Intent(this, BookGenresFragment::class.java)
+                    val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
 
                     Toast.makeText(baseContext, "Success",
@@ -76,15 +72,4 @@ class RegisterActivity : AppCompatActivity() {
                     .show()
             }
     }
-
-//    private fun replaceFragment(fragment : Fragment, title: String) {
-//
-//        // get reference for the fragment manager
-//        val fragmentManager = supportFragmentManager
-//        val fragmentTransaction = fragmentManager.beginTransaction()
-//        fragmentTransaction.replace(com.google.android.material.R.id.layout, fragment)
-//        fragmentTransaction.commit()
-//        //drawerLayout.closeDrawers() //close drawers whenever user tabs it
-//        setTitle(title)
-//    }
 }

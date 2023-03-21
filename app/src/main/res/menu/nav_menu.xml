@@ -33,6 +33,12 @@
             android:id="@+id/nav_stopped_reading"
             android:title="Stopped reading"
             android:icon="@drawable/baseline_heart_broken_24"/>
+
+            <item
+                android:id="@+id/nav_book_taste"
+                android:title="Book Taste"
+                android:icon="@drawable/baseline_auto_fix_high_24" />
+
     </group>
     </menu>
 

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -37,7 +36,8 @@ class GenresAdapter(private var genresList : ArrayList<Genres>) : RecyclerView.A
 
     override fun onBindViewHolder(holder: GenresAdapter.MyViewHolder, position: Int) {
         val currentItem = genresList[position]
-        holder.bookGenres.text = currentItem.categories
+       // holder.bookGenres.text = currentItem.categories
+        holder.checkbox.text = currentItem.categories
         holder.checkbox.isChecked = currentItem.isSelected
         //holder.checkbox.visibility = View.VISIBLE
 
@@ -51,7 +51,7 @@ class GenresAdapter(private var genresList : ArrayList<Genres>) : RecyclerView.A
 
     inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
          val checkbox : CheckBox = itemView.findViewById(R.id.type_checkboxView)
-         val bookGenres : TextView = itemView.findViewById(R.id.book_type)
+         //val bookGenres : TextView = itemView.findViewById(R.id.book_type)
          //val saveButton : Button = itemView.findViewById(R.id.save_gen_button)
 
         init {

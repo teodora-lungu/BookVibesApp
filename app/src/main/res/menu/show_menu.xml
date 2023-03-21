@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_item_to_read"
+        android:title="Add to Books to Read"
+        android:icon="@drawable/baseline_filter_vintage_24"/>
+    <item
+        android:id="@+id/menu_stop_read"
+        android:title="Add to Stopped Reading"/>
+
+    <item
+        android:id="@+id/menu_item_delete"
+        android:title="Delete"/>
+</menu>

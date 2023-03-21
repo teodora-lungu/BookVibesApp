@@ -59,8 +59,7 @@ class MyBooksFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        savedInstanceState: Bundle?): View? {
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_my_books, container, false)
@@ -68,7 +67,6 @@ class MyBooksFragment : Fragment() {
         val addBookButton = view.findViewById<Button>(R.id.add_book_button)
         val title = viewTitleAuthor.findViewById<TextView>(R.id.book_title)
         val author = viewTitleAuthor.findViewById<TextView>(R.id.book_author)
-
         //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view)
@@ -161,6 +159,31 @@ class MyBooksFragment : Fragment() {
         if (currentUser != null) {
             userRef.child(uid).child("MyBooks").push().setValue(book)
         }
+    }
+
+    fun deleteBookFromDatabase(title : String, author: String) {
+
+        userRef.child(uid).child("MyBooks").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val books = snapshot.children
+                println("Title:" + title)
+                for (book in books) {
+                    val titleFromFirebase = book.child("title").getValue(String::class.java)
+                    val authorFromFirebase = book.child("author").getValue(String::class.java)
+                    val tit = "Title: " + titleFromFirebase
+                    val aut = "Author: " + authorFromFirebase
+                    println("Title from FB:" + titleFromFirebase)
+                    if (title.equals(tit) &&
+                        author.equals(aut)) {
+                        println("DELETEEEEE")
+                        userRef.child(uid).child("MyBooks").child(book.key!!).removeValue()
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(ContentValues.TAG, "Failed to delete from Firebase", error.toException())
+            }
+        })
     }
 
     companion object {
