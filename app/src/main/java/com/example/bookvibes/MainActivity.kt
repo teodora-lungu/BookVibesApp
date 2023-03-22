@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Build
@@ -21,6 +22,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -44,6 +47,15 @@ class MainActivity : AppCompatActivity() {
     val uid = currentUser?.uid.toString()
 
 
+    private lateinit var adapter: MyAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var booksArrayList: ArrayList<Books>
+
+    lateinit var imageURL : Array<String>
+    lateinit var title : Array<String>
+    lateinit var author : Array<String>
+    lateinit var prefGen : ArrayList<String>
+
     lateinit var toggle : ActionBarDrawerToggle
     lateinit var drawerLayout: DrawerLayout
 
@@ -56,8 +68,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.activity_main, null)
+        setContentView(view)
         //setContentView(binding.navView)
+
         /**Notification Book of the Day**/
         createNotificationChannel()
         setNotification()
@@ -112,7 +128,113 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+//        /** Get menu View references **/
+//        val menuView = inflater.inflate(R.layout.book_list, null)
+//        val bookRecmImg = menuView.findViewById<ImageView>(R.id.book_image)
+//        val bookRecmTitle = menuView.findViewById<TextView>(R.id.book_title)
+//        val bookRecmAuthor = menuView.findViewById<TextView>(R.id.book_author)
+
+
+        /** Create Book Recommendation **/
+
+        //set RecyclerView
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView = findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = layoutManager
+        booksArrayList = ArrayList()
+        adapter = MyAdapter(booksArrayList)
+        recyclerView.adapter = adapter
+
+        /** Get pref genres from Firebase **/
+        prefGen = ArrayList()
+        getPrefGenresFromFirebase(prefGen)
+        println("PREF GN ON CREATE:" + prefGen)
+
+        //setRecommendation(bookRecmTitle, bookRecmAuthor, bookRecmImg)
+
     }
+
+    private fun getPrefGenresFromFirebase(prefGen : ArrayList<String>) {
+
+        /** Get menu View references **/
+        val inflater = layoutInflater
+        val menuView = inflater.inflate(R.layout.book_list, null)
+        val bookRecmImg = menuView.findViewById<ImageView>(R.id.book_image)
+        val bookRecmTitle = menuView.findViewById<TextView>(R.id.book_title)
+        val bookRecmAuthor = menuView.findViewById<TextView>(R.id.book_author)
+        if (currentUser != null) {
+            userRef.child(uid).child("Pref Genres").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val genres = snapshot.children
+                    for (gen in genres) {
+                        prefGen.add(gen.key.toString())
+                    }
+
+                    setRecommendation(bookRecmTitle, bookRecmAuthor, bookRecmImg, prefGen)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to get pref genres", error.toException())
+                }
+
+            })
+
+        }
+    }
+
+    private fun setRecommendation(title: TextView, author: TextView,
+                                  img: ImageView, prefGenList : ArrayList<String>) {
+       // println("PREF GEN " + prefGenList)
+//        if (prefGen != null) {
+        val bookType = database.reference.child("BookType")
+        //println("Book type -> " + bookType)
+        booksArrayList.clear()
+        bookType.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val types = snapshot.children
+                //println("Types: " + types)
+                for (type in types) {
+                    //println("Types from FIREBASE:" + type)
+                    for (gen in prefGen.indices) {
+                        println("Types from prefGEN: " + prefGen[gen])
+                        println("TYPES FROM FIREBASE: " + type.key.toString())
+                        if ((type.key.toString()).equals(prefGen[gen])) {
+                           for (index in type.children) {
+                                //println("CHILDRENL: " +type.children)
+                                //val bookKey = "Book" + index
+                               val titleFB = index.child("title").getValue(String::class.java)
+                               val authorFB = index.child("author").getValue(String::class.java)
+                               val imgFB = index.child("img").getValue(String::class.java)
+
+                               title.text = titleFB.toString()
+                               author.text = authorFB.toString()
+                               img.setImageBitmap(null)
+                               Glide.with(this@MainActivity)
+                                   .load("https://i.imgur.com/x4nYkym.jpg").into(img)
+
+                               booksArrayList.add(Books(titleFB, authorFB, imgFB))
+                               println("SIZE - >>>>" + booksArrayList.size)
+                               adapter.notifyDataSetChanged()
+                                //println(title + "<<<---- TITLE")
+                                //val title = bookType.child(prefGen[gen]).child(bookKey).
+                                  //      child("title").get().toString()
+                                println("TITLE:" + title)
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+    }
+       // }
+
 
     private fun setNotification() {
 

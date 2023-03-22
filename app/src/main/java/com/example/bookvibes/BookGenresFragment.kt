@@ -79,20 +79,6 @@ class BookGenresFragment : Fragment() {
         /** Get genre list form firebase **/
         getGenreList(uid, checkBox)
 
-//        //set RecyclerView
-//        val layoutManager = LinearLayoutManager(context)
-//        recyclerView = view.findViewById(R.id.recycler_view_bookType)
-//        recyclerView.layoutManager = layoutManager
-//        recyclerView.itemAnimator = DefaultItemAnimator()
-//        // recyclerView.setHasFixedSize(true)
-//        adapter = GenresAdapter(bookGenresList)
-//        recyclerView.adapter = adapter
-
-        //val genresView = inflater.inflate(R.layout.genres_list, container, false)
-        //val checkbox = genresView.findViewById<CheckBox>(R.id.type_checkboxView)
-        //val genre = genresView.findViewById<TextView>(R.id.book_type)
-        //genre.text = "mor"
-
         return view
     }
 
@@ -192,13 +178,13 @@ class BookGenresFragment : Fragment() {
             "Thriller",
             "History",
             "Science Fiction",
-            "Fantacy",
-            "Biografy",
+            "Fantasy",
+            "Biography",
             "History",
             "Art",
             "YoungAdult",
             "Memories",
-            "Filosofy")
+            "Philosophy")
 
         for (i in genre.indices) {
             val genre = Genres(genre[i], false)

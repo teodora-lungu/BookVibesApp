@@ -67,6 +67,7 @@ class MyBooksFragment : Fragment() {
         val addBookButton = view.findViewById<Button>(R.id.add_book_button)
         val title = viewTitleAuthor.findViewById<TextView>(R.id.book_title)
         val author = viewTitleAuthor.findViewById<TextView>(R.id.book_author)
+
         //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view)
