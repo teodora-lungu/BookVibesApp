@@ -177,6 +177,7 @@ class BookGenresFragment : Fragment() {
         genre = arrayOf("Romance",
             "Thriller",
             "History",
+            "Classics",
             "Science Fiction",
             "Fantasy",
             "Biography",

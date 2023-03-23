@@ -36,23 +36,12 @@ class GenresAdapter(private var genresList : ArrayList<Genres>) : RecyclerView.A
 
     override fun onBindViewHolder(holder: GenresAdapter.MyViewHolder, position: Int) {
         val currentItem = genresList[position]
-       // holder.bookGenres.text = currentItem.categories
         holder.checkbox.text = currentItem.categories
         holder.checkbox.isChecked = currentItem.isSelected
-        //holder.checkbox.visibility = View.VISIBLE
-
-       // for (category in currentItem.categories) {
-           // if (holder.checkbox.isChecked)
-             //   holder.checkbox.isChecked = holder.checkbox.isSelected
-        //Toast.makeText(this, "Image change succesfully", Toast.LENGTH_SHORT).show()
-
-       // }
     }
 
     inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
          val checkbox : CheckBox = itemView.findViewById(R.id.type_checkboxView)
-         //val bookGenres : TextView = itemView.findViewById(R.id.book_type)
-         //val saveButton : Button = itemView.findViewById(R.id.save_gen_button)
 
         init {
             checkbox.setOnClickListener { v ->
@@ -63,16 +52,8 @@ class GenresAdapter(private var genresList : ArrayList<Genres>) : RecyclerView.A
 
                 for (i in genresList.indices) {
                     Log.d("TAG", genresList.toString())
-
-                    //val intent = Intent(Context, MainActivity::class.java)
-                    //startActivity(intent)
                 }
             }
-
-            //saveButton.setOnClickListener {
-
-
-            //}
         }
     }
 

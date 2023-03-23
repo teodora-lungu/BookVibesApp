@@ -17,11 +17,13 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
 
     private val books = mutableListOf<Books>()
 
-    inner class MyViewHolder(itemView : View, val context: Context) : RecyclerView.ViewHolder(itemView) {
+    inner class MyViewHolder(itemView: View, val context: Context) :
+        RecyclerView.ViewHolder(itemView) {
         //val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
-        val bookTitle:TextView
-        val bookAuthor:TextView
-        val moreActionsView:ImageView
+        val bookTitle: TextView
+        val bookAuthor: TextView
+        val moreActionsView: ImageView
+
         init {
             bookTitle = itemView.findViewById(R.id.book_title)
             bookAuthor = itemView.findViewById(R.id.book_author)
@@ -31,6 +33,7 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
                 popupMenu(itemView)
             }
         }
+
         private fun popupMenu(itemView: View) {
             val popupMenu = PopupMenu(context, itemView, Gravity.END)
             popupMenu.inflate(R.menu.show_menu)
@@ -53,17 +56,19 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
                             .setTitle("Delete")
                             .setIcon(R.drawable.baseline_delete_24)
                             .setMessage("Are you sure you want to delete this book? ")
-                            .setPositiveButton("Yes") { dialog, _->
+                            .setPositiveButton("Yes") { dialog, _ ->
                                 //bookList.removeAt(adapterPosition)
                                 val delete = MyBooksFragment()
                                 println("Book title to delete" + bookList[adapterPosition].title!!)
-                                delete.deleteBookFromDatabase(bookList[adapterPosition].title!!,
-                                        bookList[adapterPosition].author!!)
+                                delete.deleteBookFromDatabase(
+                                    bookList[adapterPosition].title!!,
+                                    bookList[adapterPosition].author!!
+                                )
                                 bookList.removeAt(adapterPosition)
                                 notifyItemRemoved(absoluteAdapterPosition)
                                 dialog.dismiss()
                             }
-                            .setNegativeButton("No") { dialog, _->
+                            .setNegativeButton("No") { dialog, _ ->
                                 dialog.dismiss()
                             }
                             .create()
@@ -80,31 +85,23 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
                         Toast.makeText(context, "Add to Book to Read", Toast.LENGTH_SHORT).show()
                         true
                     }
-                    else-> true
+                    else -> true
                 }
 
             }
             popupMenu.show()
-            //popupMenu.setForceShowIcon(true)
-//            val popup = PopupMenu::class.java.getDeclaredField("Popup")
-//            popup.isAccessible = true
-//            val menu = popup.get(popupMenu)
-//            menu.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-//                .invoke(menu, true)
-
         }
-        // val checkbox : CheckBox = itemView.findViewById(R.id.type_checkboxView)
-        //val bookGenres : TextView = itemView.findViewById(R.id.book_type)
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.book_list,
-        parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(
+            R.layout.book_list,
+            parent, false
+        )
         return MyViewHolder(itemView, parent.context)
     }
 
-    override fun getItemCount( ) :Int {
+    override fun getItemCount(): Int {
         return bookList.size
     }
 
@@ -113,73 +110,10 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
         //holder.bookImage.setImageResource(currentItem.bookImage)
         holder.bookTitle.text = currentItem.title
         holder.bookAuthor.text = currentItem.author
-        //holder.bookGenres.setText(currentItem.categories)
-        //holder.checkbox.visibility = View.VISIBLE
 
-//        if (showBookGenres) {
-//            //holder.bookGenres.re
-//            for (category in currentItem.categories) {
-//                //val checkBox = CheckBox(holder.itemView.context)
-//                //checkBox.text = category.
-//                holder.bookGenres.text = category
-//                holder.checkbox.isChecked = holder.checkbox.isSelected
-//
-//            }
-//        }
-    }
-
-//    inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-//        val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
-//        val bookTitle:TextView
-//        val bookAuthor:TextView
-//        val moreActionsView:ImageView
-//        init {
-//            bookTitle = itemView.findViewById(R.id.book_title)
-//            bookAuthor = itemView.findViewById(R.id.book_author)
-//            moreActionsView = itemView.findViewById(R.id.more_action_View)
-//
-//            moreActionsView.setOnClickListener {
-//                popupMenu(itemView)
-//            }
-//        }
-//
-//        private fun popupMenu(itemView: View) {
-//            val popupMenu = PopupMenu(context, itemView)
-//            popupMenu.inflate(R.menu.show_menu)
-//            popupMenu.setOnMenuItemClickListener {
-//                when (it.itemId) {
-//                    R.id.menu_item_delete -> {
-//                        Toast.makeText(context, "Book Deleted", Toast.LENGTH_SHORT).show()
-//                        true
-//                    }
-//                    R.id.menu_item_favorite -> {
-//                        Toast.makeText(context, "Book Added to Favourite", Toast.LENGTH_SHORT).show()
-//                        true
-//                    }
-//                    R.id.menu_item_to_read -> {
-//                        Toast.makeText(context, "Add toBook to Read", Toast.LENGTH_SHORT).show()
-//                        true
-//                    }
-//                    else-> true
-//                }
-//
-//            }
-//            popupMenu.show()
-//            val popup = PopupMenu::class.java.getDeclaredField("Popup")
-//            popup.isAccessible = true
-//            val menu = popup.get(popupMenu)
-//            menu.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-//                .invoke(menu, true)
-//
-//        }
-//
-//
-//        // val checkbox : CheckBox = itemView.findViewById(R.id.type_checkboxView)
-//        //val bookGenres : TextView = itemView.findViewById(R.id.book_type)
-//    }
-
-    fun addBook(book: Books) {
-        books.add(book)
-        notifyItemInserted(books.size - 1)
+        fun addBook(book: Books) {
+            books.add(book)
+            notifyItemInserted(books.size - 1)
+        }
     }
 }

@@ -55,7 +55,6 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, let move to the next activity
-                   // replaceFragment(BookGenresFragment(), title = "Choose Your Fav Genres")
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
 
