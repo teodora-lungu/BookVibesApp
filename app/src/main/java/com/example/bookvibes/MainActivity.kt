@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -71,6 +72,8 @@ class MainActivity : AppCompatActivity() {
         val view = inflater.inflate(R.layout.activity_main, null)
         setContentView(view)
         //setContentView(binding.navView)
+        /** set instance for ModelView **/
+        val sharedViewModel: SharedViewModel by viewModels()
 
         /**Notification Book of the Day**/
         createNotificationChannel()
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        replaceFragment(RecommendationsFragment(), title = "ESTI CRAZY")
+        replaceFragment(RecommendationsFragment(), title = "Recommended Books")
         navView.setNavigationItemSelectedListener {
 
             //highlight the selected item
@@ -122,7 +125,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_fav_books -> Toast.makeText(applicationContext, "Clicked Fav Book", Toast.LENGTH_SHORT).show()
                 R.id.nav_books_to_read -> Toast.makeText(applicationContext, "Clicked Books to read", Toast.LENGTH_SHORT).show()
-                R.id.nav_stopped_reading -> Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
+                R.id.nav_stopped_reading -> {
+                    replaceFragment(StoppedReadingFragment(), it.title.toString())
+                    Toast.makeText(applicationContext, "Clicked Stopped reading", Toast.LENGTH_SHORT).show()
+                }
                 R.id.nav_book_taste -> replaceFragment(BookGenresFragment(), it.title.toString())
                 R.id.nav_my_books -> replaceFragment(MyBooksFragment(), it.title.toString())
                 R.id.nav_logout -> logout(navView)
@@ -155,87 +161,6 @@ class MainActivity : AppCompatActivity() {
         //setRecommendation(bookRecmTitle, bookRecmAuthor, bookRecmImg)
 
     }
-
-//    private fun getPrefGenresFromFirebase(prefGen : ArrayList<String>) {
-//
-//        /** Get menu View references **/
-//        val inflater = layoutInflater
-//        val menuView = inflater.inflate(R.layout.book_list, null)
-//        val bookRecmImg = menuView.findViewById<ImageView>(R.id.book_image)
-//        val bookRecmTitle = menuView.findViewById<TextView>(R.id.book_title)
-//        val bookRecmAuthor = menuView.findViewById<TextView>(R.id.book_author)
-//        if (currentUser != null) {
-//            userRef.child(uid).child("Pref Genres").addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val genres = snapshot.children
-//                    for (gen in genres) {
-//                        prefGen.add(gen.key.toString())
-//                    }
-//
-//                    setRecommendation(bookRecmTitle, bookRecmAuthor, bookRecmImg, prefGen)
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.e(ContentValues.TAG, "Failed to get pref genres", error.toException())
-//                }
-//
-//            })
-//
-//        }
-//    }
-//
-//    private fun setRecommendation(title: TextView, author: TextView,
-//                                  img: ImageView, prefGenList : ArrayList<String>) {
-//       // println("PREF GEN " + prefGenList)
-////        if (prefGen != null) {
-//        val bookType = database.reference.child("BookType")
-//        //println("Book type -> " + bookType)
-//        booksArrayList.clear()
-//        bookType.addValueEventListener(object: ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val types = snapshot.children
-//                //println("Types: " + types)
-//                for (type in types) {
-//                    //println("Types from FIREBASE:" + type)
-//                    for (gen in prefGen.indices) {
-//                        println("Types from prefGEN: " + prefGen[gen])
-//                        println("TYPES FROM FIREBASE: " + type.key.toString())
-//                        if ((type.key.toString()).equals(prefGen[gen])) {
-//                           for (index in type.children) {
-//                                //println("CHILDRENL: " +type.children)
-//                                //val bookKey = "Book" + index
-//                               val titleFB = index.child("title").getValue(String::class.java)
-//                               val authorFB = index.child("author").getValue(String::class.java)
-//                               val imgFB = index.child("img").getValue(String::class.java)
-//
-//                               title.text = titleFB.toString()
-//                               author.text = authorFB.toString()
-//                               //img.setImageBitmap(null)
-//                               Glide.with(this@MainActivity)
-//                                   .load(imgFB).into(img)
-//
-//                               booksArrayList.add(Books(titleFB, authorFB, Uri.parse(imgFB)))
-//                               println("SIZE - >>>>" + booksArrayList.size)
-//                               adapter.notifyDataSetChanged()
-//                                //println(title + "<<<---- TITLE")
-//                                //val title = bookType.child(prefGen[gen]).child(bookKey).
-//                                  //      child("title").get().toString()
-//                                println("TITLE:" + title)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//
-//        })
-//
-//    }
-       // }
-
 
     private fun setNotification() {
 

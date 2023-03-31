@@ -11,26 +11,39 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
-class MyAdapter(private val bookList : ArrayList<Books>) :
+class MyAdapter(private val bookList : ArrayList<Books>, private val listener: OnBookMenuClickListener) :
                 RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
+    interface OnBookMenuClickListener {
+        fun onMenuClicked(book: Books) {
+
+        }
+
+    }
+
+
     private val books = mutableListOf<Books>()
+    private var selectedBook: Books? = null
 
     inner class MyViewHolder(itemView: View, val context: Context) :
-        RecyclerView.ViewHolder(itemView) {
+        RecyclerView.ViewHolder(itemView), View.OnClickListener {
         //val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
         val bookTitle: TextView
         val bookAuthor: TextView
+        val bookImg: ImageView
         val moreActionsView: ImageView
 
         init {
             bookTitle = itemView.findViewById(R.id.book_title)
             bookAuthor = itemView.findViewById(R.id.book_author)
+            bookImg = itemView.findViewById(R.id.book_image)
             moreActionsView = itemView.findViewById(R.id.more_action_View)
 
             moreActionsView.setOnClickListener {
                 popupMenu(itemView)
+                listener?.onMenuClicked(bookList[adapterPosition])
             }
         }
 
@@ -38,6 +51,7 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
             val popupMenu = PopupMenu(context, itemView, Gravity.END)
             popupMenu.inflate(R.menu.show_menu)
             val menu = popupMenu.menu
+            val book: Books? = null
 
             /** Set icons **/
             for (i in 0 until menu.size()) {
@@ -78,6 +92,35 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
                         true
                     }
                     R.id.menu_stop_read -> {
+                        //val bundle = Bundle()
+
+                        val title = bookTitle.text.toString()
+                        val author = bookAuthor.text.toString()
+                        val image = String()
+                        Glide.with(itemView)
+                            .load(image)
+                            .into(bookImg)
+                        bookList.add(Books(title, author))
+
+                        updateSelectedBook(book)
+                        
+
+//                        listener?.onMenuClicked(bookList[adapterPosition])
+//                        true
+//                        val bookListJson = Gson().toJson(bookList[adapterPosition])
+//                        bundle.apply {
+//                            putString("stop", "VLAVLAVLA")
+//                        }
+//                        val fragment = StoppedReadingFragment()
+//                        fragment.arguments = bundle
+//                        fragment.fragmentManager?.beginTransaction()?.replace(R.id.book_author, fragment)?.commit()
+//                        println("Stopped reading---->>" + bundle)
+
+
+                        //listener.onMenuClicked(bookList[absoluteAdapterPosition])
+
+                        //parentFragmentManager.setFragmentResult("stop", )
+
                         Toast.makeText(context, "Book Stop Read", Toast.LENGTH_SHORT).show()
                         true
                     }
@@ -91,6 +134,18 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
             }
             popupMenu.show()
         }
+
+        override fun onClick(p0: View?) {
+            books?.let {
+                listener.onMenuClicked(bookList[adapterPosition])
+            }
+        }
+
+    }
+
+    fun updateSelectedBook(book: Books?) {
+            selectedBook = book
+            notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -110,6 +165,11 @@ class MyAdapter(private val bookList : ArrayList<Books>) :
         //holder.bookImage.setImageResource(currentItem.bookImage)
         holder.bookTitle.text = currentItem.title
         holder.bookAuthor.text = currentItem.author
+        Glide.with(holder.itemView)
+            .load(currentItem.img)
+            //.transition(DrawableTransitionOptions.withCrossFade())
+            .into(holder.bookImg)
+        //holder.moreActions.setImageBitmap(null)
 
         fun addBook(book: Books) {
             books.add(book)

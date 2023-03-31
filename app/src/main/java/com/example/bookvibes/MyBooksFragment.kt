@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -27,10 +28,13 @@ private const val ARG_PARAM2 = "param2"
  * Use the [MyBooksFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MyBooksFragment : Fragment() {
+class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    /** set instance for View Model **/
+    val sharedViewModel: SharedViewModel by viewModels()
 
     private lateinit var adapter: MyAdapter
     private lateinit var recyclerView: RecyclerView
@@ -68,12 +72,13 @@ class MyBooksFragment : Fragment() {
         val title = viewTitleAuthor.findViewById<TextView>(R.id.book_title)
         val author = viewTitleAuthor.findViewById<TextView>(R.id.book_author)
 
+
         //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = layoutManager
         // recyclerView.setHasFixedSize(true)
-        adapter = MyAdapter(booksArrayList)
+        adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
 
         /** get books from Firebase **/
@@ -81,9 +86,58 @@ class MyBooksFragment : Fragment() {
         addBookButton.setOnClickListener {
             showAddBookDialog()
         }
+        val bundle = Bundle()
+        bundle.apply {
+            putString("stop", "BLABLA")
+        }
 
+        val fragment = StoppedReadingFragment()
+        fragment.arguments = bundle
+//            val secondFragment = StoppedReadingFragment().apply {
+//                arguments = bundle
+//            }
         //return inflater.inflate(R.layout.fragment_my_books, container, false)
         return view
+    }
+
+    override fun onMenuClicked(book: Books) {
+        //super.onMenuClicked(book)
+        println("nmenuCLICKE" + book)
+        sharedViewModel.setSelectedBook(book)
+        adapter.updateSelectedBook(book)
+        addBookToStoppedReadling(book)
+    }
+
+    private fun addBookToStoppedReadling(bookStop : Books) {
+        if (currentUser != null) {
+
+            //userRef.child(uid).child("StoppedReading").push().setValue(book)
+            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object  : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val books = snapshot.children
+
+                    if (!snapshot.exists()) {
+                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                    }
+                    for (book in books) {
+                        val bookTitle = book.child("title").getValue(String::class.java)
+                        println("BOOKTITLE:" + bookTitle)
+                        val bookSTOPTITLE = bookStop.title
+                        println("SOTPPPP" + bookSTOPTITLE)
+                        if (book.child("title").getValue(String::class.java).equals(bookStop.title)) {
+                            println("la fel")
+                        } else {
+                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to get stopped reading books", error.toException())
+                }
+
+            })
+        }
     }
 
     fun getBooksFromFirebase(uid : String, title : TextView, author : TextView) {
@@ -104,6 +158,12 @@ class MyBooksFragment : Fragment() {
 
                     booksArrayList.add(Books("Title: $titleFromFirebase",
                                              "Author: $authorFromFirebase"))
+//                    val bundle = Bundle().apply {
+//                        putString("stop", Gson().toJson(booksArrayList))
+//                    }
+//                    val secondFragment = StoppedReadingFragment().apply {
+//                        arguments = bundle
+          //          }
                     adapter.notifyDataSetChanged()
                 }
 
@@ -144,6 +204,7 @@ class MyBooksFragment : Fragment() {
             addBooktoFirebase(book)
             //booksArrayList.add(book)
             booksArrayList.add(Books("Title: $title", "Author: $author"))
+
             adapter.notifyDataSetChanged()
             Toast.makeText(context, "Book Added Succesfully", Toast.LENGTH_SHORT).show()
             builder.create().dismiss()
