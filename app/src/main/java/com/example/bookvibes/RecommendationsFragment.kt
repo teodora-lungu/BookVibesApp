@@ -64,15 +64,9 @@ class RecommendationsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_recommendations, container, false)
-        //val bookView = inflater.inflate(R.layout.book_list, container, false)
-//        val title = bookView.findViewById<TextView>(R.id.book_title)
-//        val author = bookView.findViewById<TextView>(R.id.book_author)
-//        val image = bookView.findViewById<ImageView>(R.id.book_image)
-        //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_main)
         recyclerView.layoutManager = layoutManager
-        // recyclerView.setHasFixedSize(true)
         adapter = MainAdapter(booksArrayList)
         recyclerView.adapter = adapter
 
@@ -126,8 +120,6 @@ class RecommendationsFragment : Fragment() {
                         println("TYPES FROM FIREBASE: " + type.key.toString())
                         if ((type.key.toString()).equals(prefGen[gen])) {
                             for (index in type.children) {
-                                //println("CHILDRENL: " +type.children)
-                                //val bookKey = "Book" + index
                                 val titleFB = index.child("title").getValue(String::class.java)
                                 val authorFB = index.child("author").getValue(String::class.java)
                                 val imgFB = index.child("img").getValue().toString()
@@ -140,12 +132,7 @@ class RecommendationsFragment : Fragment() {
                                         .load(imgFB).into(img)
 
                                 booksArrayList.add(Books(titleFB, authorFB, imgFB))
-                                println("SIZE - >>>>" + booksArrayList.size)
                                 adapter.notifyDataSetChanged()
-                                //println(title + "<<<---- TITLE")
-                                //val title = bookType.child(prefGen[gen]).child(bookKey).
-                                //      child("title").get().toString()
-                                println("TITLE:" + title)
                             }
                         }
                     }

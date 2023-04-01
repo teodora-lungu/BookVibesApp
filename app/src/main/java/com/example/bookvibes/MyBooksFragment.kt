@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -86,48 +87,46 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         addBookButton.setOnClickListener {
             showAddBookDialog()
         }
-        val bundle = Bundle()
-        bundle.apply {
-            putString("stop", "BLABLA")
-        }
-
-        val fragment = StoppedReadingFragment()
-        fragment.arguments = bundle
-//            val secondFragment = StoppedReadingFragment().apply {
-//                arguments = bundle
-//            }
-        //return inflater.inflate(R.layout.fragment_my_books, container, false)
+//        val bundle = Bundle()
+//        bundle.apply {
+//            putString("stop", "BLABLA")
+//        }
+//
+//        val fragment = StoppedReadingFragment()
+//        fragment.arguments = bundle
         return view
     }
 
-    override fun onMenuClicked(book: Books) {
-        //super.onMenuClicked(book)
-        println("nmenuCLICKE" + book)
-        sharedViewModel.setSelectedBook(book)
-        adapter.updateSelectedBook(book)
-        addBookToStoppedReadling(book)
+    override fun onBookClicked(book: Books, item: MenuItem?) {
+        return when (item?.itemId) {
+            R.id.menu_stop_read -> {
+                //adapter.updateSelectedBook(book)
+                addBookToStoppedReading(book)
+            }
+            R.id.menu_item_to_read -> {
+                addBookToRead(book)
+            }
+            else -> super.onBookClicked(book, item)
+        }
     }
 
-    private fun addBookToStoppedReadling(bookStop : Books) {
+    private fun addBookToRead(bookToRead: Books) {
         if (currentUser != null) {
-
-            //userRef.child(uid).child("StoppedReading").push().setValue(book)
-            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object  : ValueEventListener{
+            userRef.child(uid).child("Books to Read").addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val books = snapshot.children
 
                     if (!snapshot.exists()) {
-                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                        userRef.child(uid).child("Books to Read").push().setValue(bookToRead)
                     }
                     for (book in books) {
-                        val bookTitle = book.child("title").getValue(String::class.java)
-                        println("BOOKTITLE:" + bookTitle)
-                        val bookSTOPTITLE = bookStop.title
-                        println("SOTPPPP" + bookSTOPTITLE)
-                        if (book.child("title").getValue(String::class.java).equals(bookStop.title)) {
+                        println(bookToRead.title + "<<<<<-------title")
+                        if (bookToRead.title.equals(book.child("title").getValue(String::class.java))) {
                             println("la fel")
                         } else {
-                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                            userRef.child(uid).child("Books to Read").push().setValue(bookToRead)
+                            adapter.notifyDataSetChanged()
+
                         }
                     }
                 }
@@ -139,25 +138,115 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             })
         }
     }
+//    override fun onOptionsItemSelected(item: MenuItem) : Boolean {
+//        return when (item.itemId) {
+//            R.id.menu_stop_read -> {
+//                // Do something when menu item one is selected
+//                sharedViewModel.setSelectedBook(bookOne)
+//                true
+//            }
+//            R.id.menu_item_to_read -> {
+//                // Do something when menu item two is selected
+//                sharedViewModel.setSelectedBook(bookTwo)
+//                true
+//            }
+//            else -> super<MyAdapter.OnBookMenuClickListener>.onOptionsItemSelected(item)
+//        }
+//
+//    }
+//    }(item : MenuItem) : Boolean {
+//        //super.onMenuClicked(book)
+//       // println("nmenuCLICKE" + book)
+//        //sharedViewModel.setSelectedBook(book)
+////        if ()
+////        adapter.updateSelectedBook(book)
+////        addBookToStoppedReading(book)
+//
+//        return when (item.itemId) {
+//            R.id.menu_stop_read -> {
+//                // Do something when menu item one is selected
+//                sharedViewModel.setSelectedBook(bookOne)
+//                true
+//            }
+//            R.id.menu_item_two -> {
+//                // Do something when menu item two is selected
+//                sharedViewModel.setSelectedBook(bookTwo)
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
+
+    private fun addBookToStoppedReading(bookStop : Books) {
+        if (currentUser != null) {
+
+            //userRef.child(uid).child("StoppedReading").push().setValue(book)
+            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val books = snapshot.children
+
+                    if (!snapshot.exists()) {
+                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                    }
+                    for (book in books) {
+                        println(bookStop.title + "<<<<<-------title")
+                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
+                            println("la fel")
+                        } else {
+                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                            adapter.notifyDataSetChanged()
+                           // addBooktoFirebaseStopReading(bookStop)
+                        }
+
+                    }
+                    //adapter.notifyDataSetChanged()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to get stopped reading books", error.toException())
+                }
+
+            })
+        }
+    }
+
+    private fun addBooktoFirebaseStopReading(bookStop: Books) {
+        if (currentUser != null) {
+            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val books = snapshot.children
+                    for (book in books) {
+                        println("BOOKSTOPTITLE: " + bookStop.title)
+                        println("FROMFIREBASE: " + book.child("title").getValue(String::class.java))
+                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
+                            Toast.makeText(context, "Book already added!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                        }
+                    }
+                    adapter.notifyDataSetChanged()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to add stopped reading books", error.toException())
+                }
+
+            })
+        }
+    }
 
     fun getBooksFromFirebase(uid : String, title : TextView, author : TextView) {
 
         userRef.child(uid).child("MyBooks").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val books = snapshot.children
-                //println(books)
                 for (book in books) {
-                    //println(book)
-                    //println(book.getValue(Books::class.java))
-                    //println(book.child("title").getValue(String::class.java))
                     val titleFromFirebase = book.child("title").getValue(String::class.java)
-                    //title.text = titleFromFirebase
-
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
-                    //author.text = authorFromFirebase
 
                     booksArrayList.add(Books("Title: $titleFromFirebase",
-                                             "Author: $authorFromFirebase"))
+                                             "Author: $authorFromFirebase",
+                        "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg"))
 //                    val bundle = Bundle().apply {
 //                        putString("stop", Gson().toJson(booksArrayList))
 //                    }
@@ -166,10 +255,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
           //          }
                     adapter.notifyDataSetChanged()
                 }
-
-                //val title = titleEditText.text.toString()
-                //val author = authorEditText.text.toString()
-
                 //adapter.notifyDataSetChanged()
             }
             override fun onCancelled(error: DatabaseError) {

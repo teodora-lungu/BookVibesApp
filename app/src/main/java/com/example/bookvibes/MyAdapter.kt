@@ -1,10 +1,7 @@
 package com.example.bookvibes
 
 import android.content.Context
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -21,6 +18,9 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
 
         }
 
+        fun onBookClicked(book: Books, item : MenuItem?) {
+
+        }
     }
 
 
@@ -28,7 +28,7 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
     private var selectedBook: Books? = null
 
     inner class MyViewHolder(itemView: View, val context: Context) :
-        RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        RecyclerView.ViewHolder(itemView) {
         //val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
         val bookTitle: TextView
         val bookAuthor: TextView
@@ -43,7 +43,6 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
 
             moreActionsView.setOnClickListener {
                 popupMenu(itemView)
-                listener?.onMenuClicked(bookList[adapterPosition])
             }
         }
 
@@ -63,6 +62,8 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
                 }
             }
             popupMenu.setOnMenuItemClickListener {
+                println("POPUP MENU")
+
                 when (it.itemId) {
                     R.id.menu_item_delete -> {
                         //bookList.removeAt(adapterPosition)
@@ -93,17 +94,27 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
                     }
                     R.id.menu_stop_read -> {
                         //val bundle = Bundle()
-
                         val title = bookTitle.text.toString()
                         val author = bookAuthor.text.toString()
                         val image = String()
                         Glide.with(itemView)
                             .load(image)
                             .into(bookImg)
-                        bookList.add(Books(title, author))
-
-                        updateSelectedBook(book)
-                        
+                        for (i in bookList.indices) {
+                            println(bookList[adapterPosition].title)
+                            //val tit = "Title: " + title
+                            println("TITLE ---- >" + title)
+                            if (bookList[adapterPosition].title.toString() == title) {
+                                //bookList.add(Books(title, author))
+                                println("deja in my books")
+                            } else {
+                                bookList.add(Books(title, author))
+                            }
+                        }
+                        //println("popupMenu.menu.getItem(it.itemId):" + popupMenu.menu.getItem(it.itemId))
+                        listener?.onBookClicked(bookList[adapterPosition], it)
+                        /** ABIA COMENTAT**/
+                        //updateSelectedBook(book)
 
 //                        listener?.onMenuClicked(bookList[adapterPosition])
 //                        true
@@ -117,7 +128,7 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
 //                        println("Stopped reading---->>" + bundle)
 
 
-                        //listener.onMenuClicked(bookList[absoluteAdapterPosition])
+                        //listener.onMenuClicked(book)
 
                         //parentFragmentManager.setFragmentResult("stop", )
 
@@ -125,6 +136,21 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
                         true
                     }
                     R.id.menu_item_to_read -> {
+                        val title = bookTitle.text.toString()
+                        val author = bookAuthor.text.toString()
+                        val image = String()
+                        Glide.with(itemView).load(image).into(bookImg)
+                        for (i in bookList.indices) {
+                            println(bookList[adapterPosition].title)
+                            println("TITLE ---- >" + title)
+                            if (bookList[adapterPosition].title.toString() == title) {
+                                println("deja in my books")
+                            } else {
+                                bookList.add(Books(title, author))
+                            }
+                        }
+                        listener?.onBookClicked(bookList[adapterPosition], it)
+
                         Toast.makeText(context, "Add to Book to Read", Toast.LENGTH_SHORT).show()
                         true
                     }
@@ -135,18 +161,19 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
             popupMenu.show()
         }
 
-        override fun onClick(p0: View?) {
-            books?.let {
-                listener.onMenuClicked(bookList[adapterPosition])
-            }
-        }
+//        override fun onClick(p0: View?) {
+//            println("ONCLICK FUNCTION ADAPTER")
+//            books?.let {
+//                listener.onBookClicked(bookList[adapterPosition], itemView.findViewById(R.id.menu_stop_read))
+//            }
+//        }
 
     }
 
-    fun updateSelectedBook(book: Books?) {
-            selectedBook = book
-            notifyDataSetChanged()
-    }
+//    fun updateSelectedBook(book: Books?) {
+//            selectedBook = book
+//            notifyDataSetChanged()
+//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(

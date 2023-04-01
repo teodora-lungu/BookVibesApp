@@ -9,10 +9,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -94,24 +92,24 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
 
         // Create a ViewModelProvider for this fragment
-        val viewModelProvider = ViewModelProvider(this)
+        //val viewModelProvider = ViewModelProvider(this)
 
-        // Get the SharedViewModel instance
-        sharedViewModel = viewModelProvider.get(SharedViewModel::class.java)
-        sharedViewModel.setSelectedBook(Books(title.text.toString(), author.text.toString() ,img = "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1545494980i/40916679.jpg"))
-        adapter.notifyDataSetChanged()
-
-        sharedViewModel.selectedBook.observe(viewLifecycleOwner) { book ->
-            // do something with the selected book
-            // ...
-            println("cevaaaaaa" + book)
-            title.text = book.title.toString()
-            author.text = book.title.toString()
-            Glide.with(view)
-                .load(book.img)
-                .into(image)
-            adapter.notifyDataSetChanged()
-        }
+//        // Get the SharedViewModel instance
+//        sharedViewModel = viewModelProvider.get(SharedViewModel::class.java)
+//        sharedViewModel.setSelectedBook(Books(title.text.toString(), author.text.toString() ,img = "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1545494980i/40916679.jpg"))
+//        adapter.notifyDataSetChanged()
+//
+//        sharedViewModel.selectedBook.observe(viewLifecycleOwner) { book ->
+//            // do something with the selected book
+//            // ...
+//            println("cevaaaaaa" + book)
+//            title.text = book.title.toString()
+//            author.text = book.title.toString()
+//            Glide.with(view)
+//                .load(book.img)
+//                .into(image)
+//            adapter.notifyDataSetChanged()
+//        }
 
 
         return view
@@ -119,7 +117,7 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
     fun getBooksFromFirebase(uid : String, title : TextView, author : TextView) {
 
-        userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object :
+        userRef.child(uid).child("StoppedReading").addValueEventListener(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val books = snapshot.children
@@ -129,16 +127,31 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
                     //author.text = authorFromFirebase
-
-                    booksArrayList.add(Books("Title: $titleFromFirebase",
-                        "Author: $authorFromFirebase"))
-//                    val bundle = Bundle().apply {
-//                        putString("stop", Gson().toJson(booksArrayList))
-//                    }
-//                    val secondFragment = StoppedReadingFragment().apply {
-//                        arguments = bundle
-//                    }
+                    println(titleFromFirebase + "<------TITLE FB")
+//                    for (i in booksArrayList.indices) {
+//                        if (booksArrayList[i].title.equals(titleFromFirebase)) {
+//                            println("The same")
+//                        } else {
+//                    if (booksArrayList.isEmpty())
+//                        booksArrayList.add(Books("$titleFromFirebase",
+//                                    "$authorFromFirebase"))
+//                    else {
+//                        for (i in booksArrayList.indices) {
+//                            if (booksArrayList[i].title.equals(titleFromFirebase)) {
+//                                println("CANT ADD IT")
+//                            } else {
+//                                println("CANT ADD IT,,,,")
+                    booksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase", "https://clipground.com/images/animated-open-sign-clipart-8.png"))
+//                            }
+//
                     adapter.notifyDataSetChanged()
+//                        }
+//
+//                    for (i in booksArrayList.indices) {
+//                        val title = "Title: " + titleFromFirebase
+//                        if (title.equals(booksArrayList[i])) {
+//                            println("deja adaugat")
+//                        } else {
                 }
             }
             override fun onCancelled(error: DatabaseError) {
