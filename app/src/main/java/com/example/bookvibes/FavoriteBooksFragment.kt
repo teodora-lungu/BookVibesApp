@@ -20,19 +20,23 @@ import com.google.firebase.database.ValueEventListener
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
+private lateinit var adapter: MyAdapter
+private lateinit var adapter2 : MainAdapter
+private lateinit var combinedAdapter : CombinedAdapter
+private lateinit var recyclerView: RecyclerView
+private lateinit var booksArrayList: ArrayList<Books>
+private lateinit var booksArrayList2: ArrayList<Books>
+private lateinit var combinedbooksArrayList: ArrayList<Books>
+
 /**
  * A simple [Fragment] subclass.
- * Use the [BooksToReadFragment.newInstance] factory method to
+ * Use the [FavoriteBooksFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
+class FavoriteBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
-    private lateinit var adapter: MyAdapter
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var booksArrayList: ArrayList<Books>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +45,7 @@ class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             param2 = it.getString(ARG_PARAM2)
         }
         booksArrayList = ArrayList()
+        combinedbooksArrayList = ArrayList()
     }
 
     override fun onCreateView(
@@ -48,30 +53,32 @@ class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_books_to_read, container, false)
+        val view = inflater.inflate(R.layout.fragment_favorite_books, container, false)
         val viewTitleAuthor = inflater.inflate(R.layout.book_list, container, false)
         val title = viewTitleAuthor.findViewById<TextView>(R.id.book_title)
         val author = viewTitleAuthor.findViewById<TextView>(R.id.book_author)
         val image = viewTitleAuthor.findViewById<ImageView>(R.id.book_image)
-        val moreActions = viewTitleAuthor.findViewById<ImageView>(R.id.more_action_View)
-        moreActions.setImageBitmap(null)
-        //Glide.with(view).load("").into(moreActions)
 
         //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
-        recyclerView = view.findViewById(R.id.recycler_view_to_read)
+        recyclerView = view.findViewById(R.id.recycler_view_fav)
         recyclerView.layoutManager = layoutManager
         // recyclerView.setHasFixedSize(true)
         adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
+//        adapter1 = MyAdapter(booksArrayList1, this)
+//        adapter2 = MainAdapter(booksArrayList2, this)
+//        combinedAdapter = CombinedAdapter(combinedbooksArrayList,adapter1, adapter2)
+//        recyclerView.adapter = combinedAdapter
 
-        getBooksToReadFromFirebase()
+        /** Get Fav Books from Firebase **/
+        getFavBooksFromFirebase(uid, title, author)
 
         return view
     }
 
-    private fun getBooksToReadFromFirebase() {
-        userRef.child(uid).child("Books to Read").addListenerForSingleValueEvent(object :
+    private fun getFavBooksFromFirebase(uid: String, title: TextView?, author: TextView?) {
+        userRef.child(uid).child("Favorites").addValueEventListener(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val books = snapshot.children
@@ -79,16 +86,27 @@ class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                     val titleFromFirebase = book.child("title").getValue(String::class.java)
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
 
-                    booksArrayList.add(Books("$titleFromFirebase",
-                        "$authorFromFirebase", "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg"))
+                    booksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase"))
+
+                    //adapter.setFavoriteState(0, true)
                     adapter.notifyDataSetChanged()
+//                    booksArrayList2.add(Books("$titleFromFirebase", "$authorFromFirebase"))
+//                    combinedbooksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase", "https://thumbs.dreamstime.com/b/books-heart-vector-illustration-library-decorated-tea-roses-green-branches-isolated-white-background-160123159.jpg"))
+//                    combinedAdapter.notifyDataSetChanged()
                 }
+                setFullHeartIcon(booksArrayList)
+                adapter.notifyDataSetChanged()
             }
             override fun onCancelled(error: DatabaseError) {
-                Log.e(ContentValues.TAG, "Failed to get user nickname", error.toException())
+                Log.e(ContentValues.TAG, "Failed to get user's fav books from Firebase", error.toException())
             }
         })
 
+    }
+
+    private fun setFullHeartIcon(booksArrayList: java.util.ArrayList<Books>) {
+        for (i in booksArrayList.indices)
+            adapter.setFavoriteState(i, true)
     }
 
     companion object {
@@ -98,12 +116,12 @@ class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment BooksToReadFragment.
+         * @return A new instance of fragment FavoriteBooksFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            BooksToReadFragment().apply {
+            FavoriteBooksFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

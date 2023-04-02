@@ -123,7 +123,11 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                R.id.nav_fav_books -> Toast.makeText(applicationContext, "Clicked Fav Book", Toast.LENGTH_SHORT).show()
+                R.id.nav_fav_books -> {
+                    replaceFragment(FavoriteBooksFragment(), it.title.toString())
+                    Toast.makeText(applicationContext, "Clicked Fav Book", Toast.LENGTH_SHORT)
+                        .show()
+                }
                 R.id.nav_books_to_read -> {
                     replaceFragment(BooksToReadFragment(), it.title.toString())
                     Toast.makeText(applicationContext, "Clicked Books to read", Toast.LENGTH_SHORT)

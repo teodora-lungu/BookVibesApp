@@ -40,6 +40,7 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
     private lateinit var adapter: MyAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var booksArrayList: ArrayList<Books>
+    private lateinit var favBooksList : ArrayList<Books>
 
     lateinit var imageId : Array<Int>
     lateinit var title : Array<String>
@@ -60,6 +61,7 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             param2 = it.getString(ARG_PARAM2)
         }
         booksArrayList = ArrayList()
+        favBooksList = ArrayList()
     }
 
     override fun onCreateView(
@@ -82,6 +84,8 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
 
+        /** get fav book from Firebase**/
+        getFavBooksFromFirebase(favBooksList)
         /** get books from Firebase **/
         getBooksFromFirebase(uid, title, author)
         addBookButton.setOnClickListener {
@@ -112,27 +116,86 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
     private fun addBookToRead(bookToRead: Books) {
         if (currentUser != null) {
-            userRef.child(uid).child("Books to Read").addListenerForSingleValueEvent(object : ValueEventListener{
+            userRef.child(uid).child("Books to Read").addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val books = snapshot.children
-
-                    if (!snapshot.exists()) {
-                        userRef.child(uid).child("Books to Read").push().setValue(bookToRead)
-                    }
-                    for (book in books) {
-                        println(bookToRead.title + "<<<<<-------title")
-                        if (bookToRead.title.equals(book.child("title").getValue(String::class.java))) {
-                            println("la fel")
-                        } else {
-                            userRef.child(uid).child("Books to Read").push().setValue(bookToRead)
-                            adapter.notifyDataSetChanged()
-
+                    var bookExists = false
+                    for (book in snapshot.children) {
+                        if (bookToRead.title == book.child("title").getValue(String::class.java)) {
+                            bookExists = true
+                            Toast.makeText(context, "Book already added", Toast.LENGTH_SHORT).show()
+                            break
                         }
+                    }
+
+                    if (!bookExists) {
+                        userRef.child(uid).child("Books to Read").push().setValue(bookToRead)
+                        adapter.notifyDataSetChanged()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e(ContentValues.TAG, "Failed to get stopped reading books", error.toException())
+                    Log.e(ContentValues.TAG, "Failed to get favorite books", error.toException())
+                }
+
+            })
+        }
+    }
+
+    override fun onHeartClicked(book: Books) {
+        //super.onHeartClicked(book)
+        if (book.isFavorite) {
+            removeFavBook(book)
+        } else {
+            addFavBookToFirebase(book)
+        }
+        book.isFavorite = !book.isFavorite
+    }
+
+    private fun removeFavBook(bookFav: Books) {
+        if (currentUser != null) {
+            userRef.child(uid).child("Favorites").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (book in snapshot.children) {
+                        val titleFromFirebase = book.child("title").getValue(String::class.java)
+                        val authorFromFirebase = book.child("author").getValue(String::class.java)
+                        if (bookFav.title.equals(titleFromFirebase) &&
+                            bookFav.author.equals(authorFromFirebase)) {
+                            userRef.child(uid).child("Favorites").child(book.key!!).removeValue()
+                        }
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to delete fav books from Firebase", error.toException())
+                }
+            })
+        }
+    }
+
+    private fun addFavBookToFirebase(bookFav: Books) {
+        if (currentUser != null) {
+            userRef.child(uid).child("Favorites").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+//                    if (!snapshot.exists()) {
+//                        userRef.child(uid).child("Favorites").push().setValue(bookFav)
+//                    }
+
+                    var bookExists = false
+
+                    for (book in snapshot.children) {
+                        if (bookFav.title == book.child("title").getValue(String::class.java)) {
+                            bookExists = true
+                            break
+                        }
+                    }
+
+                    if (!bookExists) {
+                        userRef.child(uid).child("Favorites").push().setValue(bookFav)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(ContentValues.TAG, "Failed to get favorite books", error.toException())
                 }
 
             })
@@ -183,76 +246,106 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             //userRef.child(uid).child("StoppedReading").push().setValue(book)
             userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val books = snapshot.children
+                    var bookExists = false
 
-                    if (!snapshot.exists()) {
-                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-                    }
-                    for (book in books) {
-                        println(bookStop.title + "<<<<<-------title")
-                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
-                            println("la fel")
-                        } else {
-                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-                            adapter.notifyDataSetChanged()
-                           // addBooktoFirebaseStopReading(bookStop)
+                    for (book in snapshot.children) {
+                        if (bookStop.title == book.child("title").getValue(String::class.java)) {
+                            bookExists = true
+                            Toast.makeText(context, "Book already added", Toast.LENGTH_SHORT).show()
+                            break
                         }
-
                     }
-                    //adapter.notifyDataSetChanged()
+
+                    if (!bookExists) {
+                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+                        adapter.notifyDataSetChanged()
+                    }
                 }
+//                    val books = snapshot.children
+//
+//                    if (!snapshot.exists()) {
+//                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+//                    }
+//                    for (book in books) {
+//                        println(bookStop.title + "<<<<<-------title")
+//                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
+//                            println("la fel")
+//                        } else {
+//                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+//                            adapter.notifyDataSetChanged()
+//                           // addBooktoFirebaseStopReading(bookStop)
+//                        }
+//
+//                    }
+                    //adapter.notifyDataSetChanged()
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e(ContentValues.TAG, "Failed to get stopped reading books", error.toException())
                 }
 
             })
-        }
     }
+}
 
-    private fun addBooktoFirebaseStopReading(bookStop: Books) {
-        if (currentUser != null) {
-            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val books = snapshot.children
-                    for (book in books) {
-                        println("BOOKSTOPTITLE: " + bookStop.title)
-                        println("FROMFIREBASE: " + book.child("title").getValue(String::class.java))
-                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
-                            Toast.makeText(context, "Book already added!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-                        }
-                    }
-                    adapter.notifyDataSetChanged()
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(ContentValues.TAG, "Failed to add stopped reading books", error.toException())
-                }
-
-            })
-        }
-    }
+//    private fun addBooktoFirebaseStopReading(bookStop: Books) {
+//        if (currentUser != null) {
+//            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    val books = snapshot.children
+//                    for (book in books) {
+//                        println("BOOKSTOPTITLE: " + bookStop.title)
+//                        println("FROMFIREBASE: " + book.child("title").getValue(String::class.java))
+//                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
+//                            Toast.makeText(context, "Book already added!", Toast.LENGTH_SHORT).show()
+//                        } else {
+//                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
+//                        }
+//                    }
+//                    adapter.notifyDataSetChanged()
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    Log.e(ContentValues.TAG, "Failed to add stopped reading books", error.toException())
+//                }
+//
+//            })
+//        }
+//    }
 
     fun getBooksFromFirebase(uid : String, title : TextView, author : TextView) {
 
         userRef.child(uid).child("MyBooks").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val books = snapshot.children
+                var bookIsFav = false
                 for (book in books) {
                     val titleFromFirebase = book.child("title").getValue(String::class.java)
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
 
-                    booksArrayList.add(Books("Title: $titleFromFirebase",
-                                             "Author: $authorFromFirebase",
-                        "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg"))
-//                    val bundle = Bundle().apply {
-//                        putString("stop", Gson().toJson(booksArrayList))
-//                    }
-//                    val secondFragment = StoppedReadingFragment().apply {
-//                        arguments = bundle
-          //          }
+                    for (i in favBooksList.indices) {
+                        val tit = "Title: " + titleFromFirebase
+                        if (tit == favBooksList[i].title) {
+                            bookIsFav = true
+                            break
+                        } else {
+                            bookIsFav = false
+                            break
+                        }
+                    }
+//                    booksArrayList.add(Books("Title: $titleFromFirebase",
+//                                             "Author: $authorFromFirebase",
+//                        "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg"))
+                    if (!bookIsFav)
+                        booksArrayList.add(Books("Title: $titleFromFirebase",
+                            "Author: $authorFromFirebase",
+                            "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg",
+                            isFavorite = true))
+                    else
+                            booksArrayList.add(Books("Title: $titleFromFirebase",
+                                "Author: $authorFromFirebase",
+                                "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg",
+                                isFavorite = false))
+                    setFullHeartIcon(booksArrayList)
                     adapter.notifyDataSetChanged()
                 }
                 //adapter.notifyDataSetChanged()
@@ -262,6 +355,11 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             }
         })
 
+    }
+
+    private fun setFullHeartIcon(booksArrayList: ArrayList<Books>) {
+        for (i in booksArrayList.indices)
+            adapter.setFavoriteState(i, booksArrayList[i].isFavorite)
     }
 
     private fun showAddBookDialog() {
@@ -313,16 +411,13 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         userRef.child(uid).child("MyBooks").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val books = snapshot.children
-                println("Title:" + title)
                 for (book in books) {
                     val titleFromFirebase = book.child("title").getValue(String::class.java)
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
                     val tit = "Title: " + titleFromFirebase
                     val aut = "Author: " + authorFromFirebase
-                    println("Title from FB:" + titleFromFirebase)
                     if (title.equals(tit) &&
                         author.equals(aut)) {
-                        println("DELETEEEEE")
                         userRef.child(uid).child("MyBooks").child(book.key!!).removeValue()
                     }
                 }
@@ -331,6 +426,44 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                 Log.e(ContentValues.TAG, "Failed to delete from Firebase", error.toException())
             }
         })
+
+        userRef.child(uid).child("Favorites").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val books = snapshot.children
+                for (book in books) {
+                    val titleFromFirebase = book.child("title").getValue(String::class.java)
+                    val authorFromFirebase = book.child("author").getValue(String::class.java)
+                    val tit = "Title: " + titleFromFirebase
+                    val aut = "Author: " + authorFromFirebase
+                    if (title.equals(titleFromFirebase) &&
+                        author.equals(authorFromFirebase)) {
+                        userRef.child(uid).child("Favorites").child(book.key!!).removeValue()
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(ContentValues.TAG, "Failed to delete from Favorites Firebase", error.toException())
+            }
+        })
+    }
+
+    private fun getFavBooksFromFirebase(bookFavList : ArrayList<Books>) {
+        com.example.bookvibes.userRef.child(uid).child("Favorites").addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val books = snapshot.children
+                for (book in books) {
+                    val titleFromFirebase = book.child("title").getValue(String::class.java)
+                    val authorFromFirebase = book.child("author").getValue(String::class.java)
+
+                    bookFavList.add(Books("$titleFromFirebase", "$authorFromFirebase"))
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(ContentValues.TAG, "Failed to get user's fav books from Firebase", error.toException())
+            }
+        })
+
     }
 
     companion object {

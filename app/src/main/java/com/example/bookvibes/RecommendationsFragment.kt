@@ -43,7 +43,7 @@ val uid = currentUser?.uid.toString()
  * Use the [RecommendationsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class RecommendationsFragment : Fragment() {
+class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -67,7 +67,7 @@ class RecommendationsFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_main)
         recyclerView.layoutManager = layoutManager
-        adapter = MainAdapter(booksArrayList)
+        adapter = MainAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
 
         /** Get pref genres from Firebase **/
@@ -105,11 +105,16 @@ class RecommendationsFragment : Fragment() {
         }
     }
 
-    private fun setRecommendation(title: TextView, author: TextView, img: ImageView, prefGen: ArrayList<String>) {
+    private fun setRecommendation(
+        title: TextView,
+        author: TextView,
+        img: ImageView,
+        prefGen: ArrayList<String>
+    ) {
         val bookType = database.reference.child("BookType")
         //println("Book type -> " + bookType)
         booksArrayList.clear()
-        bookType.addValueEventListener(object: ValueEventListener {
+        bookType.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val types = snapshot.children
                 //println("Types: " + types)
@@ -140,7 +145,11 @@ class RecommendationsFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Log.e(
+                    ContentValues.TAG,
+                    "Failed to get recommendations from Firebase",
+                    error.toException()
+                )
             }
 
         })
@@ -159,10 +168,81 @@ class RecommendationsFragment : Fragment() {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             RecommendationsFragment().apply {
-                 arguments = Bundle().apply {
+                arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onHeartClicked(book: Books) {
+        book.isFavorite = !book.isFavorite
+        if (book.isFavorite) {
+            addFavBookToFirebase(book)
+        } else {
+            removeFavBook(book)
+        }
+    }
+
+    private fun removeFavBook(bookFav: Books) {
+        if (currentUser != null) {
+            userRef.child(uid).child("Favorites")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (book in snapshot.children) {
+                            val titleFromFirebase = book.child("title").getValue(String::class.java)
+                            val authorFromFirebase =
+                                book.child("author").getValue(String::class.java)
+                            if (bookFav.title.equals(titleFromFirebase) &&
+                                bookFav.author.equals(authorFromFirebase)
+                            ) {
+                                userRef.child(uid).child("Favorites").child(book.key!!)
+                                    .removeValue()
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(
+                            ContentValues.TAG,
+                            "Failed to delete fav books from Firebase",
+                            error.toException()
+                        )
+                    }
+                })
+        }
+    }
+
+    private fun addFavBookToFirebase(bookFav: Books) {
+        if (currentUser != null) {
+            userRef.child(uid).child("Favorites")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        var bookExists = false
+
+                        for (book in snapshot.children) {
+                            if (bookFav.title == book.child("title").getValue(String::class.java)) {
+                                bookExists = true
+                                break
+                            }
+                        }
+
+                        if (!bookExists) {
+                            userRef.child(uid).child("Favorites").push().setValue(bookFav)
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(
+                            ContentValues.TAG,
+                            "Failed to get favorite books",
+                            error.toException()
+                        )
+                    }
+
+                })
+        }
     }
 }

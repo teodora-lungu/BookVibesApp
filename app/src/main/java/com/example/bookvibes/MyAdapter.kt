@@ -14,11 +14,12 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
                 RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     interface OnBookMenuClickListener {
-        fun onMenuClicked(book: Books) {
+
+        fun onBookClicked(book: Books, item : MenuItem?) {
 
         }
 
-        fun onBookClicked(book: Books, item : MenuItem?) {
+        fun onHeartClicked(book: Books) {
 
         }
     }
@@ -29,20 +30,30 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
 
     inner class MyViewHolder(itemView: View, val context: Context) :
         RecyclerView.ViewHolder(itemView) {
-        //val bookImage : ShapeableImageView = itemView.findViewById(R.id.book_image)
         val bookTitle: TextView
         val bookAuthor: TextView
         val bookImg: ImageView
         val moreActionsView: ImageView
+        val heartView : ImageView
 
         init {
+            heartView = itemView.findViewById(R.id.favorite_border_View)
             bookTitle = itemView.findViewById(R.id.book_title)
             bookAuthor = itemView.findViewById(R.id.book_author)
             bookImg = itemView.findViewById(R.id.book_image)
             moreActionsView = itemView.findViewById(R.id.more_action_View)
 
+
             moreActionsView.setOnClickListener {
                 popupMenu(itemView)
+            }
+
+            heartView.setOnClickListener {
+                heartView.setImageResource(if (bookList[adapterPosition].isFavorite)
+                    R.drawable.baseline_favorite_border_24
+                else
+                    R.drawable.baseline_favorite_24)
+                listener.onHeartClicked(bookList[adapterPosition])
             }
         }
 
@@ -197,10 +208,20 @@ class MyAdapter(private val bookList : ArrayList<Books>, private val listener: O
             //.transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.bookImg)
         //holder.moreActions.setImageBitmap(null)
+        if (currentItem.isFavorite) {
+            holder.heartView.setImageResource(R.drawable.baseline_favorite_24)
+        } else {
+            holder.heartView.setImageResource(R.drawable.baseline_favorite_border_24)
+        }
 
         fun addBook(book: Books) {
             books.add(book)
             notifyItemInserted(books.size - 1)
         }
+    }
+
+    fun setFavoriteState(position: Int, isFavorite: Boolean) {
+        bookList[position].isFavorite = isFavorite
+        notifyItemChanged(position)
     }
 }

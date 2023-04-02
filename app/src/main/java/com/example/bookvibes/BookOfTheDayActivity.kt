@@ -24,24 +24,27 @@ class BookOfTheDayActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_book_of_the_day)
 
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.activity_book_of_the_day, null)
+        setContentView(view)
+
+//        val buttonAdd = findViewById<Button>(R.id.buttonAddToRead)
+//        buttonAdd.setOnClickListener {
+//            //addBookToFirebase()
+//        }
 
         myRef.addListenerForSingleValueEvent(object  : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // retrive the data from the snapshot
-                //val value = snapshot.getValue(String::class.java).toString()
-                //for (i in snapshot.children) {
                     val link_value = snapshot.child("link").getValue(String::class.java).toString()
                     val main_class = snapshot.child("class").getValue(String::class.java).toString()
                     val desc_class = snapshot.child("desc_class").getValue(String::class.java).toString()
-                   // val desc_cleared = desc_class.replace("<br>", "\n")
                     Log.d(ContentValues.TAG, "Value is: $link_value")
                     Log.d(ContentValues.TAG, "Value is: $main_class")
                     Log.d(ContentValues.TAG, "Value of description is >>>: $desc_class")
 
                     performScraping(link_value, main_class, desc_class)
-                //}
+
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -73,20 +76,11 @@ class BookOfTheDayActivity : AppCompatActivity() {
                 //val description = i.getElementsByClass("BookPageTitleSection").toString()
                 val desc_cleared = description.substring(0,description.indexOf("\n"))
                 desc_list.add(desc_cleared)
-                println("ce pana mea?$desc_cleared")
-                println(img_list)
-                //println(img)
 
                 runOnUiThread {
-            //println("img list is : ->>>>$img_list")
             Glide.with(this@BookOfTheDayActivity).load(img_list[0]).into(book_img)
                 descView.text = desc_cleared
-
             }
-//            runOnUiThread {
-//            //println("img list is : ->>>>$img_list")
-//            Glide.with(this@BookOfTheDayActivity).load(img_list[0]).into(book_img)
-//                descView.text = desc_cleared
         }
 
         }

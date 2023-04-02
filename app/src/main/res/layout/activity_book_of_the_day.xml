@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:fillViewport="true">
 <!--    tools:layout_editor_absoluteX="1dp"-->
 <!--    tools:layout_editor_absoluteY="1dp"-->
@@ -15,7 +15,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         tools:context=".BookOfTheDayActivity">
 
         <ImageView
@@ -37,21 +37,23 @@
             android:layout_marginTop="10dp"
             android:text="TextView"
             android:textColor="#0C011E"
+            android:textSize="19dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/book_img" />
 
-        <Button
-            android:layout_width="181dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="30dp"
-            android:text="Add to BOOKS TO READ"
-            android:textColor="#FFFFFF"
-            android:background="#000000"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description" />
+<!--        <Button-->
+<!--            android:id="@+id/buttonAddToRead"-->
+<!--            android:layout_width="181dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_marginTop="30dp"-->
+<!--            android:text="Add to BOOKS TO READ"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:background="#000000"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/description" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

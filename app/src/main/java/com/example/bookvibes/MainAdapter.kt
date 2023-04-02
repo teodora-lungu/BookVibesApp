@@ -9,16 +9,31 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-class MainAdapter(private val bookList : ArrayList<Books>) :
+class MainAdapter(private val bookList : ArrayList<Books>, private val listener: OnHeartIconListener) :
     RecyclerView.Adapter<MainAdapter.MyViewHolder>() {
     private val books = mutableListOf<Books>()
 
+    interface OnHeartIconListener {
+        fun onHeartClicked(book : Books)
+    }
     inner class MyViewHolder(itemView: View, val context: Context) :
         RecyclerView.ViewHolder(itemView) {
         val bookTitle: TextView = itemView.findViewById(R.id.book_title)
         val bookAuthor: TextView = itemView.findViewById(R.id.book_author)
         val bookImg : ImageView = itemView.findViewById(R.id.book_image)
         val moreActions : ImageView = itemView.findViewById(R.id.more_action_View)
+        val heartView : ImageView = itemView.findViewById(R.id.favorite_border_View)
+
+        init {
+            heartView.setImageBitmap(null)
+            heartView.setOnClickListener {
+                heartView.setImageResource(if (bookList[adapterPosition].isFavorite)
+                    R.drawable.baseline_favorite_border_24
+                else
+                    R.drawable.baseline_favorite_24)
+                listener.onHeartClicked(bookList[adapterPosition])
+            }
+        }
 
     }
 
