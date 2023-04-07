@@ -11,9 +11,6 @@ import com.google.firebase.database.FirebaseDatabase
 
 class GenresAdapter(private var genresList : ArrayList<Genres>) : RecyclerView.Adapter<GenresAdapter.MyViewHolder>() {
 
-    //private val genres = mutableListOf<Genres>()
-    //private val arrayList: ArrayList<Genres>
-
     val mAuth = FirebaseAuth.getInstance()
     val currentUser = mAuth.currentUser
     val database = FirebaseDatabase.getInstance()

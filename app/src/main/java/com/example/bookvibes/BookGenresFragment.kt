@@ -72,7 +72,6 @@ class BookGenresFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_bookType)
         recyclerView.layoutManager = layoutManager
-        // recyclerView.setHasFixedSize(true)
         adapter = GenresAdapter(bookGenresList)
         recyclerView.adapter = adapter
 
@@ -93,7 +92,6 @@ class BookGenresFragment : Fragment() {
 
                     val category = gen.key
                     val isSelected = gen.getValue(Boolean::class.java) ?: false
-                    //bookGenresList.add(Genres(category!!, isSelected))
 
                     for (genre in bookGenresList) {
                         if (genre.categories == category) {
@@ -126,7 +124,6 @@ class BookGenresFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recycler_view_bookType)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
-        //recyclerView.setHasFixedSize(true)
         adapter = GenresAdapter(bookGenresList)
         recyclerView.adapter = adapter
 
@@ -135,7 +132,6 @@ class BookGenresFragment : Fragment() {
             saveButton.setOnClickListener {
                 userRef.child(uid).child("Pref Genres").removeValue()
                 for (i in bookGenresList.indices) {
-                    //  Log.d("TAG", "---->>>>>" + bookGenresList[i])
                 if (currentUser != null) {
                     if (bookGenresList[i].isSelected) {
                         val genre = bookGenresList[i].categories

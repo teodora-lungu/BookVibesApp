@@ -63,18 +63,37 @@ class FavoriteBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_fav)
         recyclerView.layoutManager = layoutManager
-        // recyclerView.setHasFixedSize(true)
         adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
-//        adapter1 = MyAdapter(booksArrayList1, this)
-//        adapter2 = MainAdapter(booksArrayList2, this)
-//        combinedAdapter = CombinedAdapter(combinedbooksArrayList,adapter1, adapter2)
-//        recyclerView.adapter = combinedAdapter
 
         /** Get Fav Books from Firebase **/
         getFavBooksFromFirebase(uid, title, author)
 
+        /** Get Fav Recommended Books from Firebase **/
+        getFavRecommendedBooksFromFirebase(uid)
+
         return view
+    }
+
+    private fun getFavRecommendedBooksFromFirebase(uid: String) {
+        userRef.child(uid).child("FavoritesRecommendations").addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val books = snapshot.children
+                for (book in books) {
+                    val titleFromFirebase = book.child("title").getValue(String::class.java)
+                    val authorFromFirebase = book.child("author").getValue(String::class.java)
+
+                    booksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase"))
+                    adapter.notifyDataSetChanged()
+                }
+                setFullHeartIcon(booksArrayList)
+                adapter.notifyDataSetChanged()
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(ContentValues.TAG, "Failed to get recomm user's fav books from Firebase", error.toException())
+            }
+        })
     }
 
     private fun getFavBooksFromFirebase(uid: String, title: TextView?, author: TextView?) {
@@ -88,11 +107,7 @@ class FavoriteBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
                     booksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase"))
 
-                    //adapter.setFavoriteState(0, true)
                     adapter.notifyDataSetChanged()
-//                    booksArrayList2.add(Books("$titleFromFirebase", "$authorFromFirebase"))
-//                    combinedbooksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase", "https://thumbs.dreamstime.com/b/books-heart-vector-illustration-library-decorated-tea-roses-green-branches-isolated-white-background-160123159.jpg"))
-//                    combinedAdapter.notifyDataSetChanged()
                 }
                 setFullHeartIcon(booksArrayList)
                 adapter.notifyDataSetChanged()

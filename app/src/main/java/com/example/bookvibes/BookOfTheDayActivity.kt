@@ -11,8 +11,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
 //import org.jetbrains.anko.doAsync
@@ -28,11 +30,6 @@ class BookOfTheDayActivity : AppCompatActivity() {
         val inflater = layoutInflater
         val view = inflater.inflate(R.layout.activity_book_of_the_day, null)
         setContentView(view)
-
-//        val buttonAdd = findViewById<Button>(R.id.buttonAddToRead)
-//        buttonAdd.setOnClickListener {
-//            //addBookToFirebase()
-//        }
 
         myRef.addListenerForSingleValueEvent(object  : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -62,11 +59,10 @@ class BookOfTheDayActivity : AppCompatActivity() {
         val desc_list = ArrayList<String>()
         val descView = findViewById<TextView>(R.id.description)
 
-        GlobalScope.async {
+       /** GlobalScope.async {
             var doc = Jsoup.connect(link).get()
             var allinfo = doc.getElementsByClass(main_class)
 
-            // println(allinfo)
             for (i in allinfo) {
                 val img = i.getElementsByTag("img").attr("src")
                 img_list.add(img)
@@ -83,6 +79,35 @@ class BookOfTheDayActivity : AppCompatActivity() {
             }
         }
 
+        } **/
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                var doc = Jsoup.connect(link).get()
+                var allinfo = doc.getElementsByClass(main_class)
+                val img_list = mutableListOf<String>()
+                val desc_list = mutableListOf<String>()
+
+                for (i in allinfo) {
+                    val img = i.getElementsByTag("img").attr("src")
+                    img_list.add(img)
+
+                    val description = i.getElementsByClass(desc_class)
+                        .toString().replace("<br>", "").substringAfter("\n")
+                    println(description)
+                    val desc_cleared = description.substring(0, description.indexOf("\n"))
+                    desc_list.add(desc_cleared)
+                    println(img_list)
+                }
+
+                withContext(Dispatchers.Main) {
+                    Glide.with(this@BookOfTheDayActivity).load(img_list[0]).into(book_img)
+                    descView.text = desc_list[0]
+                }
+
+            }catch (e: Exception) {
+                Log.e("BOOKOFTHEDAY", "Error during web scraping: ${e.message}")
+            }
         }
     }
 }

@@ -180,8 +180,8 @@ class MainActivity : AppCompatActivity() {
         calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
         println(System.currentTimeMillis())
-        calendar.set(Calendar.HOUR_OF_DAY, 18)
-        calendar.set(Calendar.MINUTE, 58)
+        calendar.set(Calendar.HOUR_OF_DAY, 17)
+        calendar.set(Calendar.MINUTE, 37)
         alarmManager.setRepeating(
 
             AlarmManager.RTC_WAKEUP, calendar.timeInMillis,

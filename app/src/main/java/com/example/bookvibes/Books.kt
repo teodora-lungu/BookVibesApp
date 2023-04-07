@@ -7,5 +7,3 @@ data class Books(var title : String? = null,
     {
         constructor() : this("", "", "", false)
     }
-
-//, var bookImage : Int)

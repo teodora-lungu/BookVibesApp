@@ -91,20 +91,12 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         addBookButton.setOnClickListener {
             showAddBookDialog()
         }
-//        val bundle = Bundle()
-//        bundle.apply {
-//            putString("stop", "BLABLA")
-//        }
-//
-//        val fragment = StoppedReadingFragment()
-//        fragment.arguments = bundle
         return view
     }
 
     override fun onBookClicked(book: Books, item: MenuItem?) {
         return when (item?.itemId) {
             R.id.menu_stop_read -> {
-                //adapter.updateSelectedBook(book)
                 addBookToStoppedReading(book)
             }
             R.id.menu_item_to_read -> {
@@ -142,7 +134,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
     }
 
     override fun onHeartClicked(book: Books) {
-        //super.onHeartClicked(book)
         if (book.isFavorite) {
             removeFavBook(book)
         } else {
@@ -175,9 +166,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         if (currentUser != null) {
             userRef.child(uid).child("Favorites").addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-//                    if (!snapshot.exists()) {
-//                        userRef.child(uid).child("Favorites").push().setValue(bookFav)
-//                    }
 
                     var bookExists = false
 
@@ -201,49 +189,9 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             })
         }
     }
-//    override fun onOptionsItemSelected(item: MenuItem) : Boolean {
-//        return when (item.itemId) {
-//            R.id.menu_stop_read -> {
-//                // Do something when menu item one is selected
-//                sharedViewModel.setSelectedBook(bookOne)
-//                true
-//            }
-//            R.id.menu_item_to_read -> {
-//                // Do something when menu item two is selected
-//                sharedViewModel.setSelectedBook(bookTwo)
-//                true
-//            }
-//            else -> super<MyAdapter.OnBookMenuClickListener>.onOptionsItemSelected(item)
-//        }
-//
-//    }
-//    }(item : MenuItem) : Boolean {
-//        //super.onMenuClicked(book)
-//       // println("nmenuCLICKE" + book)
-//        //sharedViewModel.setSelectedBook(book)
-////        if ()
-////        adapter.updateSelectedBook(book)
-////        addBookToStoppedReading(book)
-//
-//        return when (item.itemId) {
-//            R.id.menu_stop_read -> {
-//                // Do something when menu item one is selected
-//                sharedViewModel.setSelectedBook(bookOne)
-//                true
-//            }
-//            R.id.menu_item_two -> {
-//                // Do something when menu item two is selected
-//                sharedViewModel.setSelectedBook(bookTwo)
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
 
     private fun addBookToStoppedReading(bookStop : Books) {
         if (currentUser != null) {
-
-            //userRef.child(uid).child("StoppedReading").push().setValue(book)
             userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var bookExists = false
@@ -261,23 +209,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                         adapter.notifyDataSetChanged()
                     }
                 }
-//                    val books = snapshot.children
-//
-//                    if (!snapshot.exists()) {
-//                        userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-//                    }
-//                    for (book in books) {
-//                        println(bookStop.title + "<<<<<-------title")
-//                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
-//                            println("la fel")
-//                        } else {
-//                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-//                            adapter.notifyDataSetChanged()
-//                           // addBooktoFirebaseStopReading(bookStop)
-//                        }
-//
-//                    }
-                    //adapter.notifyDataSetChanged()
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e(ContentValues.TAG, "Failed to get stopped reading books", error.toException())
@@ -286,31 +217,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
             })
     }
 }
-
-//    private fun addBooktoFirebaseStopReading(bookStop: Books) {
-//        if (currentUser != null) {
-//            userRef.child(uid).child("StoppedReading").addListenerForSingleValueEvent(object : ValueEventListener{
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val books = snapshot.children
-//                    for (book in books) {
-//                        println("BOOKSTOPTITLE: " + bookStop.title)
-//                        println("FROMFIREBASE: " + book.child("title").getValue(String::class.java))
-//                        if (bookStop.title.equals(book.child("title").getValue(String::class.java))) {
-//                            Toast.makeText(context, "Book already added!", Toast.LENGTH_SHORT).show()
-//                        } else {
-//                            userRef.child(uid).child("StoppedReading").push().setValue(bookStop)
-//                        }
-//                    }
-//                    adapter.notifyDataSetChanged()
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.e(ContentValues.TAG, "Failed to add stopped reading books", error.toException())
-//                }
-//
-//            })
-//        }
-//    }
 
     fun getBooksFromFirebase(uid : String, title : TextView, author : TextView) {
 
@@ -332,9 +238,7 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                             break
                         }
                     }
-//                    booksArrayList.add(Books("Title: $titleFromFirebase",
-//                                             "Author: $authorFromFirebase",
-//                        "https://thumbs.dreamstime.com/z/stack-books-textbooks-flowers-around-cartoon-flat-style-character-white-background-different-colored-covers-lot-169307038.jpg"))
+
                     if (!bookIsFav)
                         booksArrayList.add(Books("Title: $titleFromFirebase",
                             "Author: $authorFromFirebase",
@@ -348,7 +252,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                     setFullHeartIcon(booksArrayList)
                     adapter.notifyDataSetChanged()
                 }
-                //adapter.notifyDataSetChanged()
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.e(ContentValues.TAG, "Failed to get user nickname", error.toException())
@@ -385,7 +288,6 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
 
             val book = Books(title, author)
             addBooktoFirebase(book)
-            //booksArrayList.add(book)
             booksArrayList.add(Books("Title: $title", "Author: $author"))
 
             adapter.notifyDataSetChanged()
@@ -484,75 +386,5 @@ class MyBooksFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                     putString(ARG_PARAM2, param2)
                 }
             }
-    }
-
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        //dataInitialize()
-//        val layoutManager = LinearLayoutManager(context)
-//        recyclerView = view.findViewById(R.id.recycler_view)
-//        recyclerView.layoutManager = layoutManager
-//        recyclerView.setHasFixedSize(true)
-//        adapter = MyAdapter(booksArrayList)
-//        recyclerView.adapter = adapter
-//    }
-
-    /** method to initialize data for MyBooks**/
-    private fun dataInitialize() {
-
-        booksArrayList = arrayListOf<Books>()
-
-        imageId = arrayOf(
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall,
-            R.drawable.booksmall
-
-        )
-
-        title = arrayOf(
-            "Another Title",
-            "Cetatea celor o mie de sori",
-            "M-am plictisit Title",
-            "Prea multe pacanele",
-            "Titlu 7000",
-            "Titlu 8000",
-            "Another Title",
-            "Cetatea celor o mie de sori",
-            "M-am plictisit Title",
-            "Prea multe pacanele",
-            "Titlu 7000",
-            "Titlu 8000"
-        )
-
-        author = arrayOf(
-            "Author 1",
-            "Author doi",
-            "Author 3",
-            "Author 4",
-            "Author 5",
-            "Author 6",
-            "Author 1",
-            "Author doi",
-            "Author 3",
-            "Author 4",
-            "Author 5",
-            "Author 6"
-        )
-
-        for (i in imageId.indices) {
-            val books = Books(title[i], author[i])
-                //, imageId[i])
-            booksArrayList.add(books)
-        }
-       /** TODO("Initialize from Firebase") **/
     }
 }

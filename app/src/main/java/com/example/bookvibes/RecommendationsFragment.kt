@@ -112,7 +112,6 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
         prefGen: ArrayList<String>
     ) {
         val bookType = database.reference.child("BookType")
-        //println("Book type -> " + bookType)
         booksArrayList.clear()
         bookType.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -131,7 +130,6 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
 
                                 title.text = titleFB.toString()
                                 author.text = authorFB.toString()
-                                //img.setImageBitmap(null)
                                 if (titleFB.toString().equals("It starts with us"))
                                     Glide.with(this@RecommendationsFragment)
                                         .load(imgFB).into(img)
@@ -178,7 +176,7 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
     override fun onHeartClicked(book: Books) {
         book.isFavorite = !book.isFavorite
         if (book.isFavorite) {
-            addFavBookToFirebase(book)
+            addFavBookRecommToFirebase(book)
         } else {
             removeFavBook(book)
         }
@@ -213,9 +211,9 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
         }
     }
 
-    private fun addFavBookToFirebase(bookFav: Books) {
+    private fun addFavBookRecommToFirebase(bookFav: Books) {
         if (currentUser != null) {
-            userRef.child(uid).child("Favorites")
+            userRef.child(uid).child("FavoritesRecommendations")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -229,7 +227,7 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
                         }
 
                         if (!bookExists) {
-                            userRef.child(uid).child("Favorites").push().setValue(bookFav)
+                            userRef.child(uid).child("FavoritesRecommendations").push().setValue(bookFav)
                             adapter.notifyDataSetChanged()
                         }
                     }
@@ -237,7 +235,7 @@ class RecommendationsFragment : Fragment(), MainAdapter.OnHeartIconListener {
                     override fun onCancelled(error: DatabaseError) {
                         Log.e(
                             ContentValues.TAG,
-                            "Failed to get favorite books",
+                            "Failed to get favorite recomm books",
                             error.toException()
                         )
                     }

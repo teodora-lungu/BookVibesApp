@@ -13,7 +13,7 @@ import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
+    lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun performLogin() {
+    fun performLogin() {
         // get input from user
         val email: EditText = findViewById(R.id.editEmail_login)
         val passwd: EditText = findViewById(R.id.editPassword_login)

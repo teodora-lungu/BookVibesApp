@@ -55,13 +55,11 @@ class BooksToReadFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         val image = viewTitleAuthor.findViewById<ImageView>(R.id.book_image)
         val moreActions = viewTitleAuthor.findViewById<ImageView>(R.id.more_action_View)
         moreActions.setImageBitmap(null)
-        //Glide.with(view).load("").into(moreActions)
 
         //set RecyclerView
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_to_read)
         recyclerView.layoutManager = layoutManager
-        // recyclerView.setHasFixedSize(true)
         adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
 

@@ -108,33 +108,20 @@ class BookOfTheDayFragment : Fragment() {
     ) {
 
         GlobalScope.launch(Dispatchers.IO) {
-//            val result = async(Dispatchers.Default) {
             try {
                 var doc = Jsoup.connect(link).get()
                 var allinfo = doc.getElementsByClass(main_class)
-                println("main class is:" + main_class)
-                //doc.html()
                 val img_list = mutableListOf<String>()
                 val desc_list = mutableListOf<String>()
 
-                //delay(3000)
-
-                //img_list.add(doc.select("ResponsiveImage").attr("src"))
-                //desc_list.add(doc.select("description").first()!!.text())
-
-                println("all info:" + allinfo)
                 for (i in allinfo) {
                     val img = i.getElementsByTag("img").attr("src")
-                    println("My img should be ------>>>>" + img)
                     img_list.add(img)
 
                     val description = i.getElementsByClass(desc_class)
                         .toString().replace("<br>", "").substringAfter("\n")
-                    //val description = i.getElementsByClass("BookPageTitleSection").toString()
-                    println(description)
                     val desc_cleared = description.substring(0, description.indexOf("\n"))
                     desc_list.add(desc_cleared)
-                    println(img_list)
                 }
 
                 withContext(Dispatchers.Main) {
@@ -145,19 +132,6 @@ class BookOfTheDayFragment : Fragment() {
             }catch (e: Exception) {
                 Log.e("BOOKOFTHEDAY", "Error during web scraping: ${e.message}")
             }
-//            delay(3000)
-//            val (img_list, desc_list) = result.await().first
-//            println(img_list + desc_list)
-//            //val desc_list = result.second
-//            // Get the results from the Pair object
-//            //val img_list = result.first
-//            //val desc_list = result.second
-//
-////            Handler(Looper.getMainLooper()).post {
-////
-////                Glide.with(this@BookOfTheDayFragment).load(img_list[0]).into(book_img)
-////                descView.text = desc_list[0]
-//            }
         }
     }
 

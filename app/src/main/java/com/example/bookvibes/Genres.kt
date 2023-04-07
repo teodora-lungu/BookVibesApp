@@ -7,8 +7,4 @@ data class Genres(var categories : String,
         return "Genres" + categories + '\'' +
                 "isSelected=" + isSelected
     }
-
-    //constructor() : this ("", false)
-
 }
-

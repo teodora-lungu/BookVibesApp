@@ -25,7 +25,6 @@ class MainAdapter(private val bookList : ArrayList<Books>, private val listener:
         val heartView : ImageView = itemView.findViewById(R.id.favorite_border_View)
 
         init {
-            heartView.setImageBitmap(null)
             heartView.setOnClickListener {
                 heartView.setImageResource(if (bookList[adapterPosition].isFavorite)
                     R.drawable.baseline_favorite_border_24

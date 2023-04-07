@@ -68,49 +68,11 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         val layoutManager = LinearLayoutManager(context)
         recyclerView = view.findViewById(R.id.recycler_view_stop)
         recyclerView.layoutManager = layoutManager
-        // recyclerView.setHasFixedSize(true)
         adapter = MyAdapter(booksArrayList, this)
         recyclerView.adapter = adapter
 
-
-         //get book from MyBooksFragment
-         //val bundle = Bundle().getString("stop")
-//        println("arg --->>>" + arguments)
-//        println("book list received --->>" + bundle)
-        // convert data from Json
-//        val args = this.arguments
-//        val received = args?.getString("stop")
-//        println("book list received --->>" + received)
-        //val result = Gson().fromJson(received, Array<Books>::class.java).toList()
-        //booksArrayList.addAll(result)
-        //adapter.notifyDataSetChanged()
-
-        //parentFragmentManager.setFragmentResult("stop", )
-        //share
         /** get books from Firebase **/
         getBooksFromFirebase(uid, title, author)
-
-
-        // Create a ViewModelProvider for this fragment
-        //val viewModelProvider = ViewModelProvider(this)
-
-//        // Get the SharedViewModel instance
-//        sharedViewModel = viewModelProvider.get(SharedViewModel::class.java)
-//        sharedViewModel.setSelectedBook(Books(title.text.toString(), author.text.toString() ,img = "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1545494980i/40916679.jpg"))
-//        adapter.notifyDataSetChanged()
-//
-//        sharedViewModel.selectedBook.observe(viewLifecycleOwner) { book ->
-//            // do something with the selected book
-//            // ...
-//            println("cevaaaaaa" + book)
-//            title.text = book.title.toString()
-//            author.text = book.title.toString()
-//            Glide.with(view)
-//                .load(book.img)
-//                .into(image)
-//            adapter.notifyDataSetChanged()
-//        }
-
 
         return view
     }
@@ -123,35 +85,10 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
                 val books = snapshot.children
                 for (book in books) {
                     val titleFromFirebase = book.child("title").getValue(String::class.java)
-                    //title.text = titleFromFirebase
 
                     val authorFromFirebase = book.child("author").getValue(String::class.java)
-                    //author.text = authorFromFirebase
-                    println(titleFromFirebase + "<------TITLE FB")
-//                    for (i in booksArrayList.indices) {
-//                        if (booksArrayList[i].title.equals(titleFromFirebase)) {
-//                            println("The same")
-//                        } else {
-//                    if (booksArrayList.isEmpty())
-//                        booksArrayList.add(Books("$titleFromFirebase",
-//                                    "$authorFromFirebase"))
-//                    else {
-//                        for (i in booksArrayList.indices) {
-//                            if (booksArrayList[i].title.equals(titleFromFirebase)) {
-//                                println("CANT ADD IT")
-//                            } else {
-//                                println("CANT ADD IT,,,,")
                     booksArrayList.add(Books("$titleFromFirebase", "$authorFromFirebase", "https://clipground.com/images/animated-open-sign-clipart-8.png"))
-//                            }
-//
                     adapter.notifyDataSetChanged()
-//                        }
-//
-//                    for (i in booksArrayList.indices) {
-//                        val title = "Title: " + titleFromFirebase
-//                        if (title.equals(booksArrayList[i])) {
-//                            println("deja adaugat")
-//                        } else {
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -160,23 +97,6 @@ class StoppedReadingFragment : Fragment(), MyAdapter.OnBookMenuClickListener {
         })
 
     }
-
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        adapter = MyAdapter(booksArrayList, object : AdapterView.OnItemClickListener,
-//            MyAdapter.OnBookMenuClickListener {
-//
-//            fun onItemClick(books: Books) {
-//                TODO("Not yet implemented")
-//                println(books.author)
-//            }
-//
-//            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-//        recyclerView.adapter = adapter
-//    }
 
     companion object {
         /**
